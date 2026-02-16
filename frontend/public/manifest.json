@@ -1,0 +1,24 @@
+{
+  "short_name": "SportTix",
+  "name": "SportTix - Sports Tickets PWA",
+  "description": "Buy and manage sports tickets for football, hockey, tennis, basketball and more",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0055FF",
+  "background_color": "#0A0A0A",
+  "orientation": "portrait"
+}
