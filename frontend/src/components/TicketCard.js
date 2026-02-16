@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { MapPin, Calendar, Users } from 'lucide-react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import { cn } from '@/lib/utils';
 
 export const TicketCard = ({ ticket, showQR = false, className = '' }) => {
@@ -70,7 +70,7 @@ export const TicketCard = ({ ticket, showQR = false, className = '' }) => {
               data-testid="ticket-qr-code"
               className="flex justify-center py-4 bg-white rounded-lg"
             >
-              <QRCode 
+              <QRCodeSVG 
                 value={`SPORTTIX-${ticket.id}`} 
                 size={200}
                 level="H"
