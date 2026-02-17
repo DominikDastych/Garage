@@ -25,6 +25,23 @@
         </style>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
+        <script>
+            // Remove Emergent badge if it's added dynamically
+            setInterval(function() {
+                var badge = document.getElementById('emergent-badge');
+                if (badge) {
+                    badge.remove();
+                }
+                // Also remove any link with emergent in href at bottom right
+                var links = document.querySelectorAll('a[href*="emergent"]');
+                links.forEach(function(link) {
+                    var style = window.getComputedStyle(link);
+                    if (style.position === 'fixed' && (style.bottom !== 'auto' || style.right !== 'auto')) {
+                        link.remove();
+                    }
+                });
+            }, 500);
+        </script>
         <!--
         These two scripts have been added for the Visual Edits, please do not edit or remove them
         -->
