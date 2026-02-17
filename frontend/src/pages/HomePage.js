@@ -177,21 +177,16 @@ export const HomePage = () => {
                 </h2>
               </div>
               
-              <Carousel className="w-full">
-                <CarouselContent>
-                  {featuredEvents.map((event) => (
-                    <CarouselItem key={event.id} className="basis-[85%]">
-                      <EventCard
-                        event={event}
-                        isFavorite={favorites.includes(event.id)}
-                        onToggleFavorite={handleToggleFavorite}
-                      />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="left-2" />
-                <CarouselNext className="right-2" />
-              </Carousel>
+              <div className="space-y-4">
+                {featuredEvents.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    isFavorite={favorites.includes(event.id)}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
