@@ -9,13 +9,7 @@ import { favoritesApi } from '@/services/favoritesApi';
 import { settingsApi } from '@/services/settingsApi';
 import { cartApi } from '@/services/cartApi';
 import { cn } from '@/lib/utils';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+// Carousel removed due to babel plugin issues
 
 const categories = [
   { id: 'all', label: 'All', icon: '🎯' },
