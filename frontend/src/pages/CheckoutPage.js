@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 const paymentMethods = [
   { id: 'card', name: 'Credit Card', icon: '💳', description: 'Visa, Mastercard, Amex' },
   { id: 'paypal', name: 'PayPal', icon: '🅿️', description: 'Pay with your PayPal account' },
-  { id: 'applepay', name: 'Apple Pay', icon: '🍎', description: 'Quick and secure payment' },
+  { id: 'applepay', name: 'Apple Pay', icon: '', description: 'Quick and secure payment' },
   { id: 'googlepay', name: 'Google Pay', icon: '🅖', description: 'Pay with Google' },
 ];
 
