@@ -200,6 +200,19 @@ async def fetch_events_from_sportsdb(sport: str, league_id: str) -> List[dict]:
                 data = response.json()
                 if data and data.get("events"):
                     for idx, event in enumerate(data["events"][:10]):
+                        # Verify the event matches the sport we requested
+                        event_sport = event.get("strSport", "").lower()
+                        if sport == "soccer" and event_sport != "soccer":
+                            continue
+                        if sport == "basketball" and event_sport != "basketball":
+                            continue
+                        if sport == "ice_hockey" and event_sport not in ["ice hockey", "hockey"]:
+                            continue
+                        if sport == "tennis" and event_sport != "tennis":
+                            continue
+                        if sport == "golf" and event_sport != "golf":
+                            continue
+                            
                         base_price = 50 + (idx * 10)  # Vary prices
                         sections = generate_sections(sport, base_price)
                         
@@ -222,6 +235,90 @@ async def fetch_events_from_sportsdb(sport: str, league_id: str) -> List[dict]:
                         })
     except Exception as e:
         logger.error(f"Error fetching {sport} events: {e}")
+    
+    # If no events from API, generate realistic fallback events
+    if not events:
+        events = generate_fallback_events_for_sport(sport)
+    
+    return events
+
+def generate_fallback_events_for_sport(sport: str) -> List[dict]:
+    """Generate realistic fallback events when API doesn't return data"""
+    from datetime import timedelta
+    
+    fallback_data = {
+        "basketball": [
+            {"home": "LA Lakers", "away": "Golden State Warriors", "venue": "Crypto.com Arena", "city": "Los Angeles", "league": "NBA"},
+            {"home": "Boston Celtics", "away": "Miami Heat", "venue": "TD Garden", "city": "Boston", "league": "NBA"},
+            {"home": "Chicago Bulls", "away": "New York Knicks", "venue": "United Center", "city": "Chicago", "league": "NBA"},
+            {"home": "Brooklyn Nets", "away": "Philadelphia 76ers", "venue": "Barclays Center", "city": "New York", "league": "NBA"},
+            {"home": "Phoenix Suns", "away": "Denver Nuggets", "venue": "Footprint Center", "city": "Phoenix", "league": "NBA"},
+        ],
+        "ice_hockey": [
+            {"home": "Toronto Maple Leafs", "away": "Montreal Canadiens", "venue": "Scotiabank Arena", "city": "Toronto", "league": "NHL"},
+            {"home": "New York Rangers", "away": "Boston Bruins", "venue": "Madison Square Garden", "city": "New York", "league": "NHL"},
+            {"home": "Chicago Blackhawks", "away": "Detroit Red Wings", "venue": "United Center", "city": "Chicago", "league": "NHL"},
+            {"home": "Edmonton Oilers", "away": "Calgary Flames", "venue": "Rogers Place", "city": "Edmonton", "league": "NHL"},
+            {"home": "Pittsburgh Penguins", "away": "Washington Capitals", "venue": "PPG Paints Arena", "city": "Pittsburgh", "league": "NHL"},
+        ],
+        "tennis": [
+            {"home": "Men's Singles", "away": "Quarterfinals", "venue": "Rod Laver Arena", "city": "Melbourne", "league": "Australian Open"},
+            {"home": "Women's Singles", "away": "Semifinals", "venue": "Arthur Ashe Stadium", "city": "New York", "league": "US Open"},
+            {"home": "Men's Doubles", "away": "Finals", "venue": "Centre Court", "city": "London", "league": "Wimbledon"},
+            {"home": "Mixed Doubles", "away": "Round of 16", "venue": "Philippe-Chatrier", "city": "Paris", "league": "French Open"},
+            {"home": "ATP Finals", "away": "Group Stage", "venue": "Pala Alpitour", "city": "Turin", "league": "ATP Tour"},
+        ],
+        "golf": [
+            {"home": "The Masters", "away": "Round 3", "venue": "Augusta National", "city": "Augusta", "league": "PGA Tour"},
+            {"home": "US Open", "away": "Final Round", "venue": "Pinehurst No. 2", "city": "Pinehurst", "league": "PGA Tour"},
+            {"home": "The Open Championship", "away": "Round 2", "venue": "Royal Troon", "city": "Scotland", "league": "PGA Tour"},
+            {"home": "PGA Championship", "away": "Round 1", "venue": "Valhalla Golf Club", "city": "Louisville", "league": "PGA Tour"},
+            {"home": "The Players", "away": "Final Round", "venue": "TPC Sawgrass", "city": "Florida", "league": "PGA Tour"},
+        ],
+        "soccer": [
+            {"home": "Manchester United", "away": "Liverpool", "venue": "Old Trafford", "city": "Manchester", "league": "Premier League"},
+            {"home": "Real Madrid", "away": "Barcelona", "venue": "Santiago Bernabéu", "city": "Madrid", "league": "La Liga"},
+            {"home": "Bayern Munich", "away": "Borussia Dortmund", "venue": "Allianz Arena", "city": "Munich", "league": "Bundesliga"},
+        ],
+    }
+    
+    events = []
+    sport_events = fallback_data.get(sport, fallback_data.get("soccer", []))
+    base_date = datetime.now(timezone.utc)
+    
+    for idx, match in enumerate(sport_events):
+        # Spread events over the next few weeks
+        event_date = base_date + timedelta(days=idx * 3 + 1, hours=idx * 2)
+        base_price = 50 + (idx * 15)
+        sections = generate_sections(sport, base_price)
+        
+        if sport == "tennis":
+            title = f"{match['home']} - {match['away']}"
+            teams = f"{match['home']} {match['away']}"
+        elif sport == "golf":
+            title = f"{match['home']} - {match['away']}"
+            teams = match['home']
+        else:
+            title = f"{match['home']} vs {match['away']}"
+            teams = f"{match['home']} vs {match['away']}"
+        
+        events.append({
+            "id": f"{sport}-fallback-{idx+1}",
+            "sport": sport,
+            "title": title,
+            "teams": teams,
+            "venue": match["venue"],
+            "city": match["city"],
+            "date": event_date.isoformat(),
+            "priceFrom": min(s["price"] for s in sections),
+            "priceTo": max(s["price"] for s in sections),
+            "image": get_sport_image(sport, idx),
+            "featured": idx < 2,
+            "description": f"Don't miss this exciting {sport} event at {match['venue']}!",
+            "sections": sections,
+            "league": match["league"],
+            "country": match["city"],
+        })
     
     return events
 
