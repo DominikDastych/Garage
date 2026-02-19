@@ -1,11 +1,25 @@
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
-const getToken = () => localStorage.getItem('car_garage_token');
+const getToken = () => {
+  const token = localStorage.getItem('car_garage_token');
+  return token;
+};
 
-const headers = () => ({
-  'Content-Type': 'application/json',
-  ...(getToken() && { 'Authorization': `Bearer ${getToken()}` })
-});
+const headers = () => {
+  const token = getToken();
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
+
+const handleResponse = async (res) => {
+  if (res.status === 401) {
+    // Token expired or invalid - clear storage
+    console.warn('Authentication failed - token may be expired');
+  }
+  return res;
+};
 
 export const authApi = {
   async register(email, password, name) {
