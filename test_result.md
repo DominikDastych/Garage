@@ -281,8 +281,10 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "Formulář pro přidání/úpravu auta"
+  stuck_tasks:
+    - "Formulář pro přidání/úpravu auta"
   test_all: false
   test_priority: "high_first"
 
@@ -291,3 +293,5 @@ agent_communication:
     message: "Implementována kompletní My Car Garage PWA. Backend: autentizace JWT, CRUD auta, servisní záznamy, statistiky, API-Ninjas integrace. Frontend: tmavý sportovní design, responsive mobile-first, persistentní theme."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: All 14 backend API endpoints tested successfully. User auth (register/login), car CRUD operations, service records management, statistics, API-Ninjas integration, and settings all working correctly. JWT authentication properly implemented. API-Ninjas integration functional. All endpoints return valid JSON responses with correct status codes."
+  - agent: "testing"
+    message: "🔍 FRONTEND TESTING RESULTS: Registration/login ✅, Dashboard ✅, Settings ✅, PWA ✅ all working perfectly in mobile viewport. CRITICAL ISSUE: Session persistence problem in car form - users get logged out during form interaction, preventing car addition/editing. This blocks testing of car detail and service record features. Authentication token management needs investigation."
