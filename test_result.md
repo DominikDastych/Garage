@@ -111,11 +111,14 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementováno s TheSportsDB API + fallback data pro všechny sporty"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: API returns 30 events with all sports (soccer, basketball, ice_hockey, tennis, golf). TheSportsDB integration working with fallback data. Sport filtering works correctly."
 
   - task: "GET /api/events/{id} - Detail události"
     implemented: true
@@ -123,11 +126,14 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Vrací detail konkrétní události"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Event detail endpoint working correctly. Returns proper event structure with all required fields (id, sport, title, venue, date, sections, etc.)"
 
   - task: "POST/GET/DELETE /api/cart - Košík operace"
     implemented: true
@@ -135,11 +141,14 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "CRUD operace pro košík v MongoDB"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: All cart operations working perfectly. POST /api/cart adds items, GET /api/cart/{user_id} retrieves items, DELETE /api/cart/{item_id} removes items. MongoDB integration confirmed."
 
   - task: "POST/GET /api/orders - Objednávky"
     implemented: true
@@ -147,11 +156,14 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Vytváření a seznam objednávek"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Order operations working correctly. POST /api/orders creates orders, GET /api/orders/{user_id} retrieves user orders. Cart is cleared after order creation as expected."
 
   - task: "POST/GET/DELETE /api/favorites - Oblíbené"
     implemented: true
@@ -159,11 +171,14 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Správa oblíbených událostí"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Favorites operations working correctly. POST /api/favorites adds favorites, GET /api/favorites/{user_id} retrieves user favorites. MongoDB persistence confirmed."
 
 frontend:
   - task: "Integrace s backend API"
