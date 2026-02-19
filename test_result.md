@@ -187,11 +187,14 @@ frontend:
     file: "frontend/src/services/*.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Frontend služby aktualizovány pro backend API s offline fallback"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Backend API integration working perfectly. Events loading from API, cart operations functional, favorites working. All API calls successful with proper error handling."
 
   - task: "Filtrování sportů (soccer, basketball, ice_hockey, tennis, golf)"
     implemented: true
@@ -199,11 +202,98 @@ frontend:
     file: "frontend/src/pages/HomePage.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Kategorie aktualizovány pro všechny sporty"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: All sport filters working correctly (All, Football, Basketball, Hockey, Tennis, Golf). Events filter properly by sport category. UI responsive on mobile viewport."
+
+  - task: "Onboarding Flow"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/OnboardingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Onboarding flow working perfectly. Shows welcome slides, 'Skip for now' button functional, redirects to home page correctly."
+
+  - task: "Home Page UI and Navigation"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/HomePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Home page fully functional. SPORTTIX title visible, search bar working, Featured Events section displaying, event cards clickable."
+
+  - task: "Event Detail Page"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/EventDetailPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Event detail page working perfectly. Shows title, venue, date, description, ticket sections with prices, quantity controls, add-ons, Add to Cart functionality."
+
+  - task: "Cart Flow"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/CartPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Cart functionality working perfectly. Items display correctly, promo code functionality, quantity changes, remove items, totals calculation accurate."
+
+  - task: "Bottom Navigation"
+    implemented: true
+    working: true
+    file: "frontend/src/components/BottomNav.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Bottom navigation fully functional. All tabs working (HOME, TICKETS, FAVORITES, PROFILE). Proper active state indication."
+
+  - task: "Favorites Functionality"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/FavoritesPage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Favorites functionality working. Can favorite events from home page, favorites page displays correctly (both empty and with content states)."
+
+  - task: "Mobile Responsiveness"
+    implemented: true
+    working: true
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Mobile responsiveness confirmed. App works perfectly on mobile viewport (375x812). All interactions work smoothly on mobile."
 
 metadata:
   created_by: "main_agent"
