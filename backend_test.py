@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-SportTix Backend API Test Suite
-Tests all backend endpoints for the sports ticket selling mobile app
+My Car Garage Backend API Test Suite
+Tests all backend endpoints for the car garage management app
 """
 
 import requests
@@ -13,12 +13,17 @@ import uuid
 # API Base URL from frontend/.env
 API_BASE_URL = "https://bug-tracker-51.preview.emergentagent.com/api"
 
-class SportTixAPITester:
+class CarGarageAPITester:
     def __init__(self):
         self.base_url = API_BASE_URL
         self.session = requests.Session()
         self.session.timeout = 30
-        self.test_user_id = "test_user_" + str(uuid.uuid4())[:8]
+        self.test_email = f"test{uuid.uuid4().hex[:8]}@example.com"
+        self.test_password = "password123"
+        self.test_name = "Test User"
+        self.auth_token = None
+        self.test_car_id = None
+        self.test_service_id = None
         self.test_results = []
         
     def log_test(self, test_name, success, message="", response_data=None):
@@ -50,243 +55,367 @@ class SportTixAPITester:
             self.log_test("Health Check", False, f"Exception: {str(e)}")
         return False
         
-    def test_get_sports(self):
-        """Test GET /api/sports endpoint"""
+    def test_user_registration(self):
+        """Test POST /api/auth/register"""
         try:
-            response = self.session.get(f"{self.base_url}/sports")
+            user_data = {
+                "email": self.test_email,
+                "password": self.test_password,
+                "name": self.test_name
+            }
+            
+            response = self.session.post(f"{self.base_url}/auth/register", json=user_data)
             if response.status_code == 200:
                 data = response.json()
-                if "sports" in data and isinstance(data["sports"], list):
-                    sports = data["sports"]
-                    expected_sports = ["soccer", "basketball", "ice_hockey", "tennis", "golf"]
-                    found_sports = [sport["id"] for sport in sports]
-                    
-                    if all(sport in found_sports for sport in expected_sports):
-                        self.log_test("Get Sports", True, f"Found all expected sports: {found_sports}")
-                        return True
-                    else:
-                        self.log_test("Get Sports", False, f"Missing sports. Found: {found_sports}, Expected: {expected_sports}")
+                if "token" in data and "user" in data:
+                    self.auth_token = data["token"]
+                    self.log_test("User Registration", True, f"User registered successfully: {data['user']['email']}")
+                    return True
                 else:
-                    self.log_test("Get Sports", False, f"Invalid response structure: {data}")
+                    self.log_test("User Registration", False, f"Missing token or user in response: {data}")
             else:
-                self.log_test("Get Sports", False, f"Status code: {response.status_code}")
+                self.log_test("User Registration", False, f"Status code: {response.status_code}, Response: {response.text}")
         except Exception as e:
-            self.log_test("Get Sports", False, f"Exception: {str(e)}")
+            self.log_test("User Registration", False, f"Exception: {str(e)}")
         return False
         
-    def test_get_events(self):
-        """Test GET /api/events endpoint"""
+    def test_user_login(self):
+        """Test POST /api/auth/login"""
         try:
-            response = self.session.get(f"{self.base_url}/events")
+            login_data = {
+                "email": self.test_email,
+                "password": self.test_password
+            }
+            
+            response = self.session.post(f"{self.base_url}/auth/login", json=login_data)
             if response.status_code == 200:
-                events = response.json()
-                if isinstance(events, list) and len(events) > 0:
-                    # Check first event structure
-                    event = events[0]
-                    required_fields = ["id", "sport", "title", "venue", "date", "priceFrom", "priceTo", "sections"]
-                    
-                    missing_fields = [field for field in required_fields if field not in event]
-                    if not missing_fields:
-                        # Check if we have events from different sports
-                        sports_found = set(e.get("sport") for e in events)
-                        self.log_test("Get Events", True, f"Found {len(events)} events with sports: {list(sports_found)}")
-                        return events
-                    else:
-                        self.log_test("Get Events", False, f"Missing required fields: {missing_fields}")
+                data = response.json()
+                if "token" in data and "user" in data:
+                    self.auth_token = data["token"]
+                    self.log_test("User Login", True, f"User logged in successfully: {data['user']['email']}")
+                    return True
                 else:
-                    self.log_test("Get Events", False, f"No events returned or invalid format")
+                    self.log_test("User Login", False, f"Missing token or user in response: {data}")
             else:
-                self.log_test("Get Events", False, f"Status code: {response.status_code}")
+                self.log_test("User Login", False, f"Status code: {response.status_code}, Response: {response.text}")
         except Exception as e:
-            self.log_test("Get Events", False, f"Exception: {str(e)}")
-        return None
+            self.log_test("User Login", False, f"Exception: {str(e)}")
+        return False
         
-    def test_get_events_by_sport(self):
-        """Test GET /api/events?sport=basketball endpoint"""
+    def test_get_car_makes(self):
+        """Test GET /api/cars/makes (no auth needed)"""
         try:
-            response = self.session.get(f"{self.base_url}/events?sport=basketball")
+            response = self.session.get(f"{self.base_url}/cars/makes")
             if response.status_code == 200:
-                events = response.json()
-                if isinstance(events, list):
-                    if len(events) > 0:
-                        # Check all events are basketball
-                        basketball_events = [e for e in events if e.get("sport") == "basketball"]
-                        if len(basketball_events) == len(events):
-                            self.log_test("Get Events by Sport", True, f"Found {len(events)} basketball events")
+                data = response.json()
+                if "makes" in data and isinstance(data["makes"], list):
+                    makes = data["makes"]
+                    expected_makes = ["BMW", "Audi", "Mercedes-Benz", "Toyota", "Honda"]
+                    found_makes = [make for make in expected_makes if make in makes]
+                    
+                    if len(found_makes) >= 3:  # At least 3 expected makes should be present
+                        self.log_test("Get Car Makes", True, f"Found {len(makes)} car makes including: {found_makes}")
+                        return True
+                    else:
+                        self.log_test("Get Car Makes", False, f"Missing expected makes. Found: {found_makes}")
+                else:
+                    self.log_test("Get Car Makes", False, f"Invalid response structure: {data}")
+            else:
+                self.log_test("Get Car Makes", False, f"Status code: {response.status_code}")
+        except Exception as e:
+            self.log_test("Get Car Makes", False, f"Exception: {str(e)}")
+        return False
+        
+    def test_search_car_specs(self):
+        """Test GET /api/cars/search (API-Ninjas integration)"""
+        try:
+            params = {"make": "BMW", "model": "M3"}
+            response = self.session.get(f"{self.base_url}/cars/search", params=params)
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    if len(data) > 0:
+                        car = data[0]
+                        required_fields = ["make", "model", "year"]
+                        missing_fields = [field for field in required_fields if field not in car]
+                        
+                        if not missing_fields:
+                            self.log_test("Search Car Specs", True, f"Found {len(data)} BMW M3 specifications")
                             return True
                         else:
-                            self.log_test("Get Events by Sport", False, f"Found non-basketball events in basketball filter")
+                            self.log_test("Search Car Specs", False, f"Missing required fields: {missing_fields}")
                     else:
-                        self.log_test("Get Events by Sport", True, "No basketball events found (acceptable)")
+                        # Empty result is acceptable for API-Ninjas (might not have data for BMW M3)
+                        self.log_test("Search Car Specs", True, "No results found (acceptable for API-Ninjas)")
                         return True
                 else:
-                    self.log_test("Get Events by Sport", False, f"Invalid response format")
+                    self.log_test("Search Car Specs", False, f"Invalid response format: {data}")
             else:
-                self.log_test("Get Events by Sport", False, f"Status code: {response.status_code}")
+                self.log_test("Search Car Specs", False, f"Status code: {response.status_code}")
         except Exception as e:
-            self.log_test("Get Events by Sport", False, f"Exception: {str(e)}")
+            self.log_test("Search Car Specs", False, f"Exception: {str(e)}")
         return False
         
-    def test_get_event_by_id(self, events):
-        """Test GET /api/events/{event_id} endpoint"""
-        if not events or len(events) == 0:
-            self.log_test("Get Event by ID", False, "No events available to test")
+    def test_create_car(self):
+        """Test POST /api/cars (with auth)"""
+        if not self.auth_token:
+            self.log_test("Create Car", False, "No auth token available")
             return False
             
         try:
-            event_id = events[0]["id"]
-            response = self.session.get(f"{self.base_url}/events/{event_id}")
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            car_data = {
+                "brand": "BMW",
+                "model": "M3",
+                "year": 2022,
+                "power_hp": 480,
+                "fuel_type": "Benzín",
+                "transmission": "Automatická",
+                "color": "Černá",
+                "license_plate": "1A2 3456",
+                "mileage": 15000
+            }
+            
+            response = self.session.post(f"{self.base_url}/cars", json=car_data, headers=headers)
             if response.status_code == 200:
-                event = response.json()
-                if event.get("id") == event_id:
-                    self.log_test("Get Event by ID", True, f"Retrieved event: {event.get('title')}")
+                data = response.json()
+                if "id" in data and data.get("brand") == "BMW":
+                    self.test_car_id = data["id"]
+                    self.log_test("Create Car", True, f"Car created successfully: {data['brand']} {data['model']}")
                     return True
                 else:
-                    self.log_test("Get Event by ID", False, f"Event ID mismatch")
+                    self.log_test("Create Car", False, f"Invalid response structure: {data}")
             else:
-                self.log_test("Get Event by ID", False, f"Status code: {response.status_code}")
+                self.log_test("Create Car", False, f"Status code: {response.status_code}, Response: {response.text}")
         except Exception as e:
-            self.log_test("Get Event by ID", False, f"Exception: {str(e)}")
+            self.log_test("Create Car", False, f"Exception: {str(e)}")
         return False
         
-    def test_cart_operations(self, events):
-        """Test cart CRUD operations"""
-        if not events or len(events) == 0:
-            self.log_test("Cart Operations", False, "No events available for cart testing")
+    def test_get_all_cars(self):
+        """Test GET /api/cars (with auth)"""
+        if not self.auth_token:
+            self.log_test("Get All Cars", False, "No auth token available")
             return False
             
         try:
-            # Test adding item to cart
-            event = events[0]
-            cart_item = {
-                "user_id": self.test_user_id,
-                "event_id": event["id"],
-                "event_title": event["title"],
-                "event_date": event["date"],
-                "event_venue": event["venue"],
-                "event_image": event.get("image", "https://example.com/img.jpg"),
-                "section_id": "lower",
-                "section_name": "Lower Bowl",
-                "price": 100,
-                "quantity": 2
-            }
-            
-            # POST /api/cart
-            response = self.session.post(f"{self.base_url}/cart", json=cart_item)
-            if response.status_code != 200:
-                self.log_test("Cart Add Item", False, f"Failed to add item. Status: {response.status_code}")
-                return False
-                
-            added_item = response.json()
-            item_id = added_item.get("id")
-            
-            # GET /api/cart/{user_id}
-            response = self.session.get(f"{self.base_url}/cart/{self.test_user_id}")
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            response = self.session.get(f"{self.base_url}/cars", headers=headers)
             if response.status_code == 200:
-                cart_items = response.json()
-                if len(cart_items) > 0 and cart_items[0].get("id") == item_id:
-                    self.log_test("Cart Get Items", True, f"Found {len(cart_items)} items in cart")
+                data = response.json()
+                if isinstance(data, list):
+                    if len(data) > 0:
+                        car = data[0]
+                        required_fields = ["id", "brand", "model", "year"]
+                        missing_fields = [field for field in required_fields if field not in car]
+                        
+                        if not missing_fields:
+                            self.log_test("Get All Cars", True, f"Found {len(data)} cars")
+                            return True
+                        else:
+                            self.log_test("Get All Cars", False, f"Missing required fields: {missing_fields}")
+                    else:
+                        self.log_test("Get All Cars", True, "No cars found (acceptable for new user)")
+                        return True
                 else:
-                    self.log_test("Cart Get Items", False, f"Cart item not found or ID mismatch")
-                    return False
+                    self.log_test("Get All Cars", False, f"Invalid response format: {data}")
             else:
-                self.log_test("Cart Get Items", False, f"Status code: {response.status_code}")
-                return False
-                
-            # DELETE /api/cart/{item_id}
-            response = self.session.delete(f"{self.base_url}/cart/{item_id}")
-            if response.status_code == 200:
-                self.log_test("Cart Remove Item", True, "Item removed successfully")
-                return True
-            else:
-                self.log_test("Cart Remove Item", False, f"Status code: {response.status_code}")
-                
+                self.log_test("Get All Cars", False, f"Status code: {response.status_code}, Response: {response.text}")
         except Exception as e:
-            self.log_test("Cart Operations", False, f"Exception: {str(e)}")
+            self.log_test("Get All Cars", False, f"Exception: {str(e)}")
         return False
         
-    def test_order_operations(self):
-        """Test order creation and retrieval"""
-        try:
-            # Create order
-            order_data = {
-                "user_id": self.test_user_id,
-                "items": [
-                    {
-                        "eventTitle": "Test Basketball Game",
-                        "quantity": 2,
-                        "pricePerTicket": 75
-                    }
-                ],
-                "total": 150
-            }
-            
-            # POST /api/orders
-            response = self.session.post(f"{self.base_url}/orders", json=order_data)
-            if response.status_code != 200:
-                self.log_test("Order Creation", False, f"Failed to create order. Status: {response.status_code}")
-                return False
-                
-            order = response.json()
-            order_id = order.get("id")
-            
-            # GET /api/orders/{user_id}
-            response = self.session.get(f"{self.base_url}/orders/{self.test_user_id}")
-            if response.status_code == 200:
-                orders = response.json()
-                if len(orders) > 0 and orders[0].get("id") == order_id:
-                    self.log_test("Order Operations", True, f"Created and retrieved order successfully")
-                    return True
-                else:
-                    self.log_test("Order Operations", False, f"Order not found in user orders")
-            else:
-                self.log_test("Order Operations", False, f"Failed to get orders. Status: {response.status_code}")
-                
-        except Exception as e:
-            self.log_test("Order Operations", False, f"Exception: {str(e)}")
-        return False
-        
-    def test_favorites_operations(self, events):
-        """Test favorites CRUD operations"""
-        if not events or len(events) == 0:
-            self.log_test("Favorites Operations", False, "No events available for favorites testing")
+    def test_create_service_record(self):
+        """Test POST /api/cars/{car_id}/services"""
+        if not self.auth_token or not self.test_car_id:
+            self.log_test("Create Service Record", False, "No auth token or car ID available")
             return False
             
         try:
-            event_id = events[0]["id"]
-            
-            # POST /api/favorites
-            favorite_data = {
-                "user_id": self.test_user_id,
-                "event_id": event_id
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            service_data = {
+                "car_id": self.test_car_id,
+                "service_type": "oil",
+                "date": "2024-01-15",
+                "cost": 2500,
+                "mileage": 16000,
+                "note": "Výměna oleje 5W-30"
             }
             
-            response = self.session.post(f"{self.base_url}/favorites", json=favorite_data)
-            if response.status_code != 200:
-                self.log_test("Favorites Add", False, f"Failed to add favorite. Status: {response.status_code}")
-                return False
-                
-            # GET /api/favorites/{user_id}
-            response = self.session.get(f"{self.base_url}/favorites/{self.test_user_id}")
+            response = self.session.post(f"{self.base_url}/cars/{self.test_car_id}/services", 
+                                       json=service_data, headers=headers)
             if response.status_code == 200:
-                favorites = response.json()
-                if len(favorites) > 0 and favorites[0].get("event_id") == event_id:
-                    self.log_test("Favorites Operations", True, f"Added and retrieved favorite successfully")
+                data = response.json()
+                if "id" in data and data.get("service_type") == "oil":
+                    self.test_service_id = data["id"]
+                    self.log_test("Create Service Record", True, f"Service record created: {data['service_type']} - {data['cost']} CZK")
                     return True
                 else:
-                    self.log_test("Favorites Operations", False, f"Favorite not found")
+                    self.log_test("Create Service Record", False, f"Invalid response structure: {data}")
             else:
-                self.log_test("Favorites Operations", False, f"Failed to get favorites. Status: {response.status_code}")
-                
+                self.log_test("Create Service Record", False, f"Status code: {response.status_code}, Response: {response.text}")
         except Exception as e:
-            self.log_test("Favorites Operations", False, f"Exception: {str(e)}")
+            self.log_test("Create Service Record", False, f"Exception: {str(e)}")
+        return False
+        
+    def test_get_service_records(self):
+        """Test GET /api/cars/{car_id}/services"""
+        if not self.auth_token or not self.test_car_id:
+            self.log_test("Get Service Records", False, "No auth token or car ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            response = self.session.get(f"{self.base_url}/cars/{self.test_car_id}/services", headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    if len(data) > 0:
+                        service = data[0]
+                        required_fields = ["id", "service_type", "date", "cost"]
+                        missing_fields = [field for field in required_fields if field not in service]
+                        
+                        if not missing_fields:
+                            self.log_test("Get Service Records", True, f"Found {len(data)} service records")
+                            return True
+                        else:
+                            self.log_test("Get Service Records", False, f"Missing required fields: {missing_fields}")
+                    else:
+                        self.log_test("Get Service Records", True, "No service records found (acceptable)")
+                        return True
+                else:
+                    self.log_test("Get Service Records", False, f"Invalid response format: {data}")
+            else:
+                self.log_test("Get Service Records", False, f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Get Service Records", False, f"Exception: {str(e)}")
+        return False
+        
+    def test_get_car_stats(self):
+        """Test GET /api/cars/{car_id}/stats"""
+        if not self.auth_token or not self.test_car_id:
+            self.log_test("Get Car Stats", False, "No auth token or car ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            response = self.session.get(f"{self.base_url}/cars/{self.test_car_id}/stats", headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["total_services", "total_cost"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("Get Car Stats", True, f"Car stats: {data['total_services']} services, {data['total_cost']} CZK total")
+                    return True
+                else:
+                    self.log_test("Get Car Stats", False, f"Missing required fields: {missing_fields}")
+            else:
+                self.log_test("Get Car Stats", False, f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Get Car Stats", False, f"Exception: {str(e)}")
+        return False
+        
+    def test_get_overall_stats(self):
+        """Test GET /api/stats"""
+        if not self.auth_token:
+            self.log_test("Get Overall Stats", False, "No auth token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            response = self.session.get(f"{self.base_url}/stats", headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["total_cars", "total_services", "total_cost"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_test("Get Overall Stats", True, f"Overall stats: {data['total_cars']} cars, {data['total_cost']} CZK total")
+                    return True
+                else:
+                    self.log_test("Get Overall Stats", False, f"Missing required fields: {missing_fields}")
+            else:
+                self.log_test("Get Overall Stats", False, f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Get Overall Stats", False, f"Exception: {str(e)}")
+        return False
+        
+    def test_update_settings(self):
+        """Test PUT /api/auth/settings"""
+        if not self.auth_token:
+            self.log_test("Update Settings", False, "No auth token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            settings_data = {
+                "theme": "light",
+                "language": "cs"
+            }
+            
+            response = self.session.put(f"{self.base_url}/auth/settings", json=settings_data, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if "message" in data and "settings" in data:
+                    self.log_test("Update Settings", True, f"Settings updated: {data['settings']}")
+                    return True
+                else:
+                    self.log_test("Update Settings", False, f"Invalid response structure: {data}")
+            else:
+                self.log_test("Update Settings", False, f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Update Settings", False, f"Exception: {str(e)}")
+        return False
+        
+    def test_delete_service_record(self):
+        """Test DELETE /api/services/{record_id}"""
+        if not self.auth_token or not self.test_service_id:
+            self.log_test("Delete Service Record", False, "No auth token or service ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            response = self.session.delete(f"{self.base_url}/services/{self.test_service_id}", headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if "message" in data:
+                    self.log_test("Delete Service Record", True, f"Service record deleted: {data['message']}")
+                    return True
+                else:
+                    self.log_test("Delete Service Record", False, f"Invalid response structure: {data}")
+            else:
+                self.log_test("Delete Service Record", False, f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Delete Service Record", False, f"Exception: {str(e)}")
+        return False
+        
+    def test_delete_car(self):
+        """Test DELETE /api/cars/{car_id}"""
+        if not self.auth_token or not self.test_car_id:
+            self.log_test("Delete Car", False, "No auth token or car ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            response = self.session.delete(f"{self.base_url}/cars/{self.test_car_id}", headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if "message" in data:
+                    self.log_test("Delete Car", True, f"Car deleted: {data['message']}")
+                    return True
+                else:
+                    self.log_test("Delete Car", False, f"Invalid response structure: {data}")
+            else:
+                self.log_test("Delete Car", False, f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("Delete Car", False, f"Exception: {str(e)}")
         return False
         
     def run_all_tests(self):
         """Run all API tests"""
-        print(f"🚀 Starting SportTix API Tests")
+        print(f"🚗 Starting My Car Garage API Tests")
         print(f"📍 API Base URL: {self.base_url}")
-        print(f"👤 Test User ID: {self.test_user_id}")
+        print(f"📧 Test Email: {self.test_email}")
         print("=" * 60)
         
         # Test 1: Health Check
@@ -294,30 +423,45 @@ class SportTixAPITester:
             print("❌ Health check failed - stopping tests")
             return False
             
-        # Test 2: Get Sports
-        self.test_get_sports()
+        # Test 2: User Registration
+        self.test_user_registration()
         
-        # Test 3: Get Events
-        events = self.test_get_events()
+        # Test 3: User Login
+        self.test_user_login()
         
-        # Test 4: Get Events by Sport
-        self.test_get_events_by_sport()
+        # Test 4: Get Car Makes (no auth needed)
+        self.test_get_car_makes()
         
-        # Test 5: Get Event by ID
-        if events:
-            self.test_get_event_by_id(events)
-            
-        # Test 6: Cart Operations
-        if events:
-            self.test_cart_operations(events)
-            
-        # Test 7: Order Operations
-        self.test_order_operations()
+        # Test 5: Search Car Specs (API-Ninjas)
+        self.test_search_car_specs()
         
-        # Test 8: Favorites Operations
-        if events:
-            self.test_favorites_operations(events)
-            
+        # Test 6: Create Car (with auth)
+        self.test_create_car()
+        
+        # Test 7: Get All Cars
+        self.test_get_all_cars()
+        
+        # Test 8: Create Service Record
+        self.test_create_service_record()
+        
+        # Test 9: Get Service Records
+        self.test_get_service_records()
+        
+        # Test 10: Get Car Stats
+        self.test_get_car_stats()
+        
+        # Test 11: Get Overall Stats
+        self.test_get_overall_stats()
+        
+        # Test 12: Update Settings
+        self.test_update_settings()
+        
+        # Test 13: Delete Service Record
+        self.test_delete_service_record()
+        
+        # Test 14: Delete Car
+        self.test_delete_car()
+        
         # Summary
         print("=" * 60)
         print("📊 TEST SUMMARY")
@@ -341,7 +485,7 @@ class SportTixAPITester:
 
 def main():
     """Main test runner"""
-    tester = SportTixAPITester()
+    tester = CarGarageAPITester()
     success = tester.run_all_tests()
     sys.exit(0 if success else 1)
 
