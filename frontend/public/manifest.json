@@ -1,24 +1,26 @@
 {
-  "short_name": "SportTix",
-  "name": "SportTix - Sports Tickets PWA",
-  "description": "Buy and manage sports tickets for football, hockey, tennis, basketball and more",
+  "name": "My Car Garage",
+  "short_name": "CarGarage",
+  "description": "Správa vašich vozidel - servis, náklady, údaje",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#ef4444",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "type": "image/png",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23ef4444' width='100' height='100' rx='20'/><text y='65' x='50' text-anchor='middle' font-size='50'>🚗</text></svg>",
       "sizes": "192x192",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512.png",
-      "type": "image/png",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23ef4444' width='100' height='100' rx='20'/><text y='65' x='50' text-anchor='middle' font-size='50'>🚗</text></svg>",
       "sizes": "512x512",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#0055FF",
-  "background_color": "#0A0A0A",
-  "orientation": "portrait"
+  "categories": ["utilities", "lifestyle"],
+  "lang": "cs"
 }

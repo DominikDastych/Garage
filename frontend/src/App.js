@@ -1,89 +1,111 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { Toaster } from '@/components/ui/sonner';
-import { initDB } from '@/lib/db';
-import { settingsApi } from '@/services/settingsApi';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LoginPage } from './pages/LoginPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { CarFormPage } from './pages/CarFormPage';
+import { CarDetailPage } from './pages/CarDetailPage';
+import { ServiceFormPage } from './pages/ServiceFormPage';
+import { SettingsPage } from './pages/SettingsPage';
+import './index.css';
 
-import { OnboardingPage } from '@/pages/OnboardingPage';
-import { HomePage } from '@/pages/HomePage';
-import { EventsListPage } from '@/pages/EventsListPage';
-import { EventDetailPage } from '@/pages/EventDetailPage';
-import { CartPage } from '@/pages/CartPage';
-import { CheckoutPage } from '@/pages/CheckoutPage';
-import { PaymentSuccessPage } from '@/pages/PaymentSuccessPage';
-import { TicketsPage } from '@/pages/TicketsPage';
-import { TicketDetailPage } from '@/pages/TicketDetailPage';
-import { FavoritesPage } from '@/pages/FavoritesPage';
-import { ProfilePage } from '@/pages/ProfilePage';
-
-import '@/App.css';
-
-function App() {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [onboardingComplete, setOnboardingComplete] = useState(false);
-
-  useEffect(() => {
-    initializeApp();
-  }, []);
-
-  const initializeApp = async () => {
-    try {
-      await initDB();
-      const settings = await settingsApi.get();
-      setOnboardingComplete(settings.onboardingComplete);
-      setIsInitialized(true);
-    } catch (error) {
-      console.error('Error initializing app:', error);
-      setIsInitialized(true);
-    }
-  };
-
-  if (!isInitialized) {
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-[rgb(var(--background))] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4 animate-pulse">🎫</div>
-          <h1 className="font-headings font-black text-3xl uppercase tracking-tighter">
-            SportTix
-          </h1>
-          <p className="text-muted-foreground mt-2">Loading...</p>
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center animate-pulse">
+            <span className="text-2xl">🚗</span>
+          </div>
+          <p className="text-[rgb(var(--muted-foreground))]">Načítám...</p>
         </div>
       </div>
     );
   }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
 
+const AppRoutes = () => {
+  const { isAuthenticated } = useAuth();
+  
+  return (
+    <Routes>
+      <Route 
+        path="/login" 
+        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
+      />
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/car/new" 
+        element={
+          <ProtectedRoute>
+            <CarFormPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/car/:id" 
+        element={
+          <ProtectedRoute>
+            <CarDetailPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/car/:id/edit" 
+        element={
+          <ProtectedRoute>
+            <CarFormPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/car/:carId/service/new" 
+        element={
+          <ProtectedRoute>
+            <ServiceFormPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/settings" 
+        element={
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
+};
+
+function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <div className="App bg-background min-h-screen">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                onboardingComplete ? (
-                  <Navigate to="/home" replace />
-                ) : (
-                  <Navigate to="/onboarding" replace />
-                )
-              }
-            />
-            <Route path="/onboarding" element={<OnboardingPage />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/events" element={<EventsListPage />} />
-            <Route path="/events/:id" element={<EventDetailPage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
-            <Route path="/payment-success" element={<PaymentSuccessPage />} />
-            <Route path="/tickets" element={<TicketsPage />} />
-            <Route path="/tickets/:id" element={<TicketDetailPage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-        <Toaster />
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <div className="App">
+            <AppRoutes />
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
