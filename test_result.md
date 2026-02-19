@@ -102,215 +102,121 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Přidat backend API pro SportTix mobilní aplikaci na prodej vstupenek. Integrace s TheSportsDB API pro reálná sportovní data (fotbal, basketbal, hokej, tenis, golf). Backend API pro eventy, košík, objednávky a oblíbené."
+user_problem_statement: "Vytvoření PWA aplikace My Car Garage pro správu vlastních vozidel. Funkce: přihlášení, CRUD auta, servisní záznamy, náklady, tmavý/světlý režim, API-Ninjas integrace pro specifikace aut."
 
 backend:
-  - task: "GET /api/events - Seznam sportovních událostí"
+  - task: "POST /api/auth/register - Registrace uživatele"
     implemented: true
     working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Implementováno s TheSportsDB API + fallback data pro všechny sporty"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: API returns 30 events with all sports (soccer, basketball, ice_hockey, tennis, golf). TheSportsDB integration working with fallback data. Sport filtering works correctly."
+    needs_retesting: true
 
-  - task: "GET /api/events/{id} - Detail události"
+  - task: "POST /api/auth/login - Přihlášení uživatele"
     implemented: true
     working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Vrací detail konkrétní události"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Event detail endpoint working correctly. Returns proper event structure with all required fields (id, sport, title, venue, date, sections, etc.)"
+    needs_retesting: true
 
-  - task: "POST/GET/DELETE /api/cart - Košík operace"
-    implemented: true
-    working: true
-    file: "backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "CRUD operace pro košík v MongoDB"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: All cart operations working perfectly. POST /api/cart adds items, GET /api/cart/{user_id} retrieves items, DELETE /api/cart/{item_id} removes items. MongoDB integration confirmed."
-
-  - task: "POST/GET /api/orders - Objednávky"
-    implemented: true
-    working: true
-    file: "backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Vytváření a seznam objednávek"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Order operations working correctly. POST /api/orders creates orders, GET /api/orders/{user_id} retrieves user orders. Cart is cleared after order creation as expected."
-
-  - task: "POST/GET/DELETE /api/favorites - Oblíbené"
+  - task: "GET /api/cars/search - API-Ninjas vyhledávání specifikací"
     implemented: true
     working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Správa oblíbených událostí"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Favorites operations working correctly. POST /api/favorites adds favorites, GET /api/favorites/{user_id} retrieves user favorites. MongoDB persistence confirmed."
+    needs_retesting: true
+
+  - task: "CRUD /api/cars - Správa vozidel"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+
+  - task: "CRUD /api/cars/{id}/services - Servisní záznamy"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+
+  - task: "GET /api/stats - Statistiky nákladů"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
 
 frontend:
-  - task: "Integrace s backend API"
+  - task: "Přihlášení a registrace"
     implemented: true
     working: true
-    file: "frontend/src/services/*.js"
+    file: "frontend/src/pages/LoginPage.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Frontend služby aktualizovány pro backend API s offline fallback"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Backend API integration working perfectly. Events loading from API, cart operations functional, favorites working. All API calls successful with proper error handling."
+    needs_retesting: true
 
-  - task: "Filtrování sportů (soccer, basketball, ice_hockey, tennis, golf)"
+  - task: "Dashboard - seznam vozidel"
     implemented: true
     working: true
-    file: "frontend/src/pages/HomePage.js"
+    file: "frontend/src/pages/DashboardPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+
+  - task: "Formulář pro přidání/úpravu auta"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/CarFormPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+
+  - task: "Detail auta + servisní záznamy"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/CarDetailPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+
+  - task: "Nastavení - tmavý/světlý režim"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/SettingsPage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+
+  - task: "PWA manifest"
+    implemented: true
+    working: true
+    file: "frontend/public/manifest.json"
     stuck_count: 0
     priority: "medium"
     needs_retesting: false
-    status_history:
-      - working: true
-        agent: "main"
-        comment: "Kategorie aktualizovány pro všechny sporty"
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: All sport filters working correctly (All, Football, Basketball, Hockey, Tennis, Golf). Events filter properly by sport category. UI responsive on mobile viewport."
-
-  - task: "Onboarding Flow"
-    implemented: true
-    working: true
-    file: "frontend/src/pages/OnboardingPage.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Onboarding flow working perfectly. Shows welcome slides, 'Skip for now' button functional, redirects to home page correctly."
-
-  - task: "Home Page UI and Navigation"
-    implemented: true
-    working: true
-    file: "frontend/src/pages/HomePage.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Home page fully functional. SPORTTIX title visible, search bar working, Featured Events section displaying, event cards clickable."
-
-  - task: "Event Detail Page"
-    implemented: true
-    working: true
-    file: "frontend/src/pages/EventDetailPage.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Event detail page working perfectly. Shows title, venue, date, description, ticket sections with prices, quantity controls, add-ons, Add to Cart functionality."
-
-  - task: "Cart Flow"
-    implemented: true
-    working: true
-    file: "frontend/src/pages/CartPage.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Cart functionality working perfectly. Items display correctly, promo code functionality, quantity changes, remove items, totals calculation accurate."
-
-  - task: "Bottom Navigation"
-    implemented: true
-    working: true
-    file: "frontend/src/components/BottomNav.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Bottom navigation fully functional. All tabs working (HOME, TICKETS, FAVORITES, PROFILE). Proper active state indication."
-
-  - task: "Favorites Functionality"
-    implemented: true
-    working: true
-    file: "frontend/src/pages/FavoritesPage.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Favorites functionality working. Can favorite events from home page, favorites page displays correctly (both empty and with content states)."
-
-  - task: "Mobile Responsiveness"
-    implemented: true
-    working: true
-    file: "frontend/src/App.js"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-      - working: true
-        agent: "testing"
-        comment: "✅ TESTED: Mobile responsiveness confirmed. App works perfectly on mobile viewport (375x812). All interactions work smoothly on mobile."
 
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 3
-  run_ui: true
+  test_sequence: 1
+  run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Registrace a přihlášení"
+    - "CRUD operace s auty"
+    - "Servisní záznamy"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Implementováno kompletní backend API s TheSportsDB integrací. Eventy pro fotbal načítány z API, ostatní sporty mají realistická fallback data. Frontend služby aktualizovány pro komunikaci s backendem. Potřeba otestovat všechny API endpointy."
-  - agent: "testing"
-    message: "✅ BACKEND TESTING COMPLETE: All 9 API endpoints tested successfully. TheSportsDB integration working with proper fallback data. MongoDB operations (cart, orders, favorites) all functional. Health check passing. All required sports available (soccer, basketball, ice_hockey, tennis, golf). Event structure contains all required fields. Ready for production use."
-  - agent: "testing"
-    message: "✅ FRONTEND TESTING COMPLETE: Comprehensive mobile testing completed successfully on SportTix app. All user flows tested on mobile viewport (375x812): ✅ Onboarding flow (skip functionality working) ✅ Home page (SPORTTIX title, search bar, sport filters) ✅ Event detail (title, venue, date, ticket sections, add to cart) ✅ Cart flow (items display, promo codes, totals) ✅ Bottom navigation (all 4 tabs functional) ✅ Favorites (add/remove, empty state) ✅ Mobile responsiveness confirmed. Backend API integration working perfectly. No critical issues found. App ready for production use."
+    message: "Implementována kompletní My Car Garage PWA. Backend: autentizace JWT, CRUD auta, servisní záznamy, statistiky, API-Ninjas integrace. Frontend: tmavý sportovní design, responsive mobile-first, persistentní theme."
