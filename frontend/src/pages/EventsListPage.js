@@ -157,10 +157,11 @@ export const EventsListPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Sports</SelectItem>
-                      <SelectItem value="football">Football</SelectItem>
+                      <SelectItem value="soccer">Football</SelectItem>
                       <SelectItem value="basketball">Basketball</SelectItem>
+                      <SelectItem value="ice_hockey">Hockey</SelectItem>
                       <SelectItem value="tennis">Tennis</SelectItem>
-                      <SelectItem value="hockey">Hockey</SelectItem>
+                      <SelectItem value="golf">Golf</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
