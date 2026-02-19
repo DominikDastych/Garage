@@ -13,10 +13,11 @@ import { cn } from '@/lib/utils';
 
 const categories = [
   { id: 'all', label: 'All', icon: '🎯' },
-  { id: 'football', label: 'Football', icon: '⚽' },
+  { id: 'soccer', label: 'Football', icon: '⚽' },
   { id: 'basketball', label: 'Basketball', icon: '🏀' },
+  { id: 'ice_hockey', label: 'Hockey', icon: '🏒' },
   { id: 'tennis', label: 'Tennis', icon: '🎾' },
-  { id: 'hockey', label: 'Hockey', icon: '🏒' },
+  { id: 'golf', label: 'Golf', icon: '⛳' },
 ];
 
 export const HomePage = () => {
