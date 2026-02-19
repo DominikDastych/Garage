@@ -101,3 +101,110 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Přidat backend API pro SportTix mobilní aplikaci na prodej vstupenek. Integrace s TheSportsDB API pro reálná sportovní data (fotbal, basketbal, hokej, tenis, golf). Backend API pro eventy, košík, objednávky a oblíbené."
+
+backend:
+  - task: "GET /api/events - Seznam sportovních událostí"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementováno s TheSportsDB API + fallback data pro všechny sporty"
+
+  - task: "GET /api/events/{id} - Detail události"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Vrací detail konkrétní události"
+
+  - task: "POST/GET/DELETE /api/cart - Košík operace"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "CRUD operace pro košík v MongoDB"
+
+  - task: "POST/GET /api/orders - Objednávky"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Vytváření a seznam objednávek"
+
+  - task: "POST/GET/DELETE /api/favorites - Oblíbené"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Správa oblíbených událostí"
+
+frontend:
+  - task: "Integrace s backend API"
+    implemented: true
+    working: true
+    file: "frontend/src/services/*.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Frontend služby aktualizovány pro backend API s offline fallback"
+
+  - task: "Filtrování sportů (soccer, basketball, ice_hockey, tennis, golf)"
+    implemented: true
+    working: true
+    file: "frontend/src/pages/HomePage.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Kategorie aktualizovány pro všechny sporty"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "GET /api/events - Seznam sportovních událostí"
+    - "GET /api/events/{id} - Detail události"
+    - "POST/GET/DELETE /api/cart - Košík operace"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Implementováno kompletní backend API s TheSportsDB integrací. Eventy pro fotbal načítány z API, ostatní sporty mají realistická fallback data. Frontend služby aktualizovány pro komunikaci s backendem. Potřeba otestovat všechny API endpointy."
