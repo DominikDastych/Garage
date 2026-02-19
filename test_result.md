@@ -212,10 +212,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "GET /api/events - Seznam sportovních událostí"
-    - "GET /api/events/{id} - Detail události"
-    - "POST/GET/DELETE /api/cart - Košík operace"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -223,3 +220,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Implementováno kompletní backend API s TheSportsDB integrací. Eventy pro fotbal načítány z API, ostatní sporty mají realistická fallback data. Frontend služby aktualizovány pro komunikaci s backendem. Potřeba otestovat všechny API endpointy."
+  - agent: "testing"
+    message: "✅ BACKEND TESTING COMPLETE: All 9 API endpoints tested successfully. TheSportsDB integration working with proper fallback data. MongoDB operations (cart, orders, favorites) all functional. Health check passing. All required sports available (soccer, basketball, ice_hockey, tennis, golf). Event structure contains all required fields. Ready for production use."
