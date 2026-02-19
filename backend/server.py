@@ -281,6 +281,15 @@ async def get_events(sport: Optional[str] = None, featured: Optional[bool] = Non
         if isinstance(result, list):
             all_events.extend(result)
     
+    # Deduplicate events by ID
+    seen_ids = set()
+    unique_events = []
+    for event in all_events:
+        if event["id"] not in seen_ids:
+            seen_ids.add(event["id"])
+            unique_events.append(event)
+    all_events = unique_events
+    
     # Filter by featured if specified
     if featured is not None:
         all_events = [e for e in all_events if e.get("featured") == featured]
@@ -288,16 +297,19 @@ async def get_events(sport: Optional[str] = None, featured: Optional[bool] = Non
     # Sort by date
     all_events.sort(key=lambda x: x.get("date", ""))
     
-    # If no events from API, return cached/mock events from DB
+    # If no events from API, return cached/mock events from DB (filtered by sport)
     if not all_events:
-        cached = await db.cached_events.find({}, {"_id": 0}).to_list(100)
+        query = {}
+        if sport:
+            query["sport"] = sport
+        cached = await db.cached_events.find(query, {"_id": 0}).to_list(100)
         if cached:
             return cached
         # Return default events if nothing available
         return await get_fallback_events()
     
-    # Cache events in DB
-    if all_events:
+    # Cache events in DB (only if fetching all sports)
+    if all_events and not sport:
         await db.cached_events.delete_many({})
         await db.cached_events.insert_many(all_events)
     
