@@ -111,7 +111,11 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: User registration working correctly. Successfully created user with email testac8cb797@example.com and received valid JWT token."
 
   - task: "POST /api/auth/login - Přihlášení uživatele"
     implemented: true
@@ -119,7 +123,11 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: User login working correctly. Successfully authenticated with email/password and received valid JWT token."
 
   - task: "GET /api/cars/search - API-Ninjas vyhledávání specifikací"
     implemented: true
@@ -127,7 +135,11 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: API-Ninjas integration working. Successfully retrieved BMW M3 specifications from external API."
 
   - task: "CRUD /api/cars - Správa vozidel"
     implemented: true
@@ -135,7 +147,11 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Car CRUD operations working. Successfully created BMW M3, retrieved car list, and deleted car with proper authentication."
 
   - task: "CRUD /api/cars/{id}/services - Servisní záznamy"
     implemented: true
@@ -143,7 +159,11 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Service records CRUD working. Successfully created oil change service (2500 CZK), retrieved service list, and deleted service record."
 
   - task: "GET /api/stats - Statistiky nákladů"
     implemented: true
@@ -151,7 +171,35 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Statistics endpoints working. Both car-specific stats (/api/cars/{id}/stats) and overall stats (/api/stats) return correct cost calculations."
+
+  - task: "GET /api/cars/makes - Seznam značek aut"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Car makes endpoint working. Returns 31 car brands including BMW, Audi, Mercedes-Benz, Toyota, Honda."
+
+  - task: "PUT /api/auth/settings - Nastavení uživatele"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: User settings update working. Successfully updated theme to 'light' and language to 'cs'."
 
 frontend:
   - task: "Přihlášení a registrace"
