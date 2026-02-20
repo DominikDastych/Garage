@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { carsApi } from '../services/api';
 import { ArrowLeft, Search, Loader2, Camera, X, ChevronDown, Check } from 'lucide-react';
@@ -25,6 +25,17 @@ const BODY_TYPES = [
   { id: 'cabrio', label: 'Cabrio', icon: '🛻' },
 ];
 
+// Predefined car images by type
+const CAR_IMAGES = {
+  sedan: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800',
+  hatchback: 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800',
+  kombi: 'https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800',
+  suv: 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800',
+  coupe: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800',
+  cabrio: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800',
+  default: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800',
+};
+
 export const CarFormPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -35,7 +46,6 @@ export const CarFormPage = () => {
   const [makes, setMakes] = useState([]);
   const [models, setModels] = useState([]);
   const [loadingModels, setLoadingModels] = useState(false);
-  const [loadingImage, setLoadingImage] = useState(false);
   
   // Dropdown states
   const [showMakeDropdown, setShowMakeDropdown] = useState(false);
@@ -74,12 +84,14 @@ export const CarFormPage = () => {
     }
   }, [formData.brand]);
 
-  // Auto-load image when brand and model are set
+  // Set default image based on body type
   useEffect(() => {
-    if (formData.brand && formData.model && !formData.image) {
-      loadCarImage(formData.brand, formData.model);
+    if (formData.body_type && !formData.image) {
+      const bodyKey = formData.body_type.toLowerCase();
+      const imageUrl = CAR_IMAGES[bodyKey] || CAR_IMAGES.default;
+      setFormData(prev => ({ ...prev, image: imageUrl }));
     }
-  }, [formData.brand, formData.model]);
+  }, [formData.body_type]);
 
   const loadMakes = async () => {
     try {
@@ -100,20 +112,6 @@ export const CarFormPage = () => {
       setModels([]);
     } finally {
       setLoadingModels(false);
-    }
-  };
-
-  const loadCarImage = async (make, model) => {
-    setLoadingImage(true);
-    try {
-      const data = await carsApi.getImage(make, model);
-      if (data?.image_url) {
-        setFormData(prev => ({ ...prev, image: data.image_url }));
-      }
-    } catch (err) {
-      console.error('Error loading image:', err);
-    } finally {
-      setLoadingImage(false);
     }
   };
 
@@ -164,6 +162,12 @@ export const CarFormPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.brand || !formData.model) {
+      alert('Vyplňte značku a model vozidla');
+      return;
+    }
+    
     setSaving(true);
     
     try {
@@ -172,7 +176,8 @@ export const CarFormPage = () => {
         year: parseInt(formData.year),
         power_kw: formData.power_kw ? parseInt(formData.power_kw) : null,
         power_hp: formData.power_hp ? parseInt(formData.power_hp) : null,
-        mileage: formData.mileage ? parseInt(formData.mileage) : null
+        mileage: formData.mileage ? parseInt(formData.mileage) : null,
+        image: formData.image || CAR_IMAGES.default
       };
       
       if (isEdit) {
@@ -184,26 +189,26 @@ export const CarFormPage = () => {
       navigate('/dashboard');
     } catch (err) {
       console.error('Error saving car:', err);
+      alert('Nepodařilo se uložit vozidlo');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Opravdu chcete smazat toto vozidlo? Tato akce je nevratná.')) return;
+    if (!window.confirm('Opravdu chcete smazat toto vozidlo?\n\nVšechny servisní záznamy budou také smazány.')) return;
     
     try {
       await carsApi.delete(id);
-      alert('Vozidlo bylo úspěšně smazáno');
       navigate('/dashboard');
     } catch (err) {
       console.error('Error deleting car:', err);
-      alert('Nepodařilo se smazat vozidlo. Zkuste to znovu.');
+      alert('Nepodařilo se smazat vozidlo');
     }
   };
 
   const selectMake = (make) => {
-    setFormData(prev => ({ ...prev, brand: make, model: '', image: '' }));
+    setFormData(prev => ({ ...prev, brand: make, model: '' }));
     setMakeSearch(make);
     setModelSearch('');
     setShowMakeDropdown(false);
@@ -234,40 +239,42 @@ export const CarFormPage = () => {
   return (
     <div className="min-h-screen bg-[rgb(var(--background))] pb-8">
       {/* Header */}
-      <div className="bg-[rgb(var(--card))] border-b border-[rgb(var(--border))] px-4 py-4 flex items-center gap-4 sticky top-0 z-10">
-        <button onClick={() => navigate(-1)} className="p-2 hover:bg-[rgb(var(--secondary))] rounded-lg">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <h1 className="text-lg font-semibold">{isEdit ? 'Upravit vozidlo' : 'Nové vozidlo'}</h1>
+      <div className="bg-gradient-to-br from-[rgb(var(--primary))] to-orange-600 pt-4 pb-6 px-4 sticky top-0 z-20">
+        <div className="max-w-lg mx-auto flex items-center gap-4">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="p-2 bg-white/20 backdrop-blur rounded-xl hover:bg-white/30 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
+          <h1 className="text-lg font-semibold text-white">
+            {isEdit ? 'Upravit vozidlo' : 'Nové vozidlo'}
+          </h1>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 space-y-6">
-        {/* Car Image */}
+      <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 space-y-6">
+        
+        {/* Car Image Preview */}
         <div className="relative">
-          <div className="w-full h-48 bg-[rgb(var(--card))] rounded-2xl overflow-hidden flex items-center justify-center">
-            {loadingImage ? (
-              <Loader2 className="w-8 h-8 animate-spin text-[rgb(var(--muted-foreground))]" />
-            ) : formData.image ? (
-              <img src={formData.image} alt="Car" className="w-full h-full object-cover" />
+          <div className="w-full h-48 bg-[rgb(var(--card))] rounded-2xl overflow-hidden">
+            {formData.image ? (
+              <img 
+                src={formData.image} 
+                alt="Car" 
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.src = CAR_IMAGES.default; }}
+              />
             ) : (
-              <div className="text-center">
-                <Camera className="w-12 h-12 mx-auto text-[rgb(var(--muted-foreground))]" />
-                <p className="text-xs text-[rgb(var(--muted-foreground))] mt-2">Obrázek se načte automaticky</p>
+              <div className="w-full h-full flex flex-col items-center justify-center text-[rgb(var(--muted-foreground))]">
+                <Camera className="w-12 h-12 mb-2" />
+                <p className="text-sm">Vyberte typ karoserie pro obrázek</p>
               </div>
             )}
           </div>
-          {formData.image && (
-            <button
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
-              className="absolute top-2 right-2 p-1 bg-black/50 rounded-full"
-            >
-              <X className="w-4 h-4 text-white" />
-            </button>
-          )}
         </div>
 
-        {/* Brand Autocomplete */}
+        {/* Brand */}
         <div className="relative">
           <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
             Značka *
@@ -280,25 +287,24 @@ export const CarFormPage = () => {
                 setMakeSearch(e.target.value);
                 setShowMakeDropdown(true);
                 if (!e.target.value) {
-                  setFormData(prev => ({ ...prev, brand: '', model: '', image: '' }));
+                  setFormData(prev => ({ ...prev, brand: '', model: '' }));
                 }
               }}
               onFocus={() => setShowMakeDropdown(true)}
-              className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))] pr-10"
+              className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] pr-10 focus:border-[rgb(var(--primary))] focus:ring-2 focus:ring-[rgb(var(--primary))]/20 transition-all"
               placeholder="Vyhledejte značku..."
-              required
             />
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[rgb(var(--muted-foreground))]" />
           </div>
           
           {showMakeDropdown && filteredMakes.length > 0 && (
-            <div className="absolute z-20 w-full mt-1 bg-[rgb(var(--card))] rounded-lg border border-[rgb(var(--border))] shadow-xl max-h-60 overflow-y-auto">
+            <div className="absolute z-30 w-full mt-2 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] shadow-xl max-h-60 overflow-y-auto">
               {filteredMakes.map((make) => (
                 <button
                   key={make}
                   type="button"
                   onClick={() => selectMake(make)}
-                  className="w-full px-4 py-3 text-left hover:bg-[rgb(var(--secondary))] flex items-center justify-between"
+                  className="w-full px-4 py-3 text-left hover:bg-[rgb(var(--secondary))] flex items-center justify-between transition-colors"
                 >
                   <span>{make}</span>
                   {formData.brand === make && <Check className="w-4 h-4 text-[rgb(var(--primary))]" />}
@@ -308,7 +314,7 @@ export const CarFormPage = () => {
           )}
         </div>
 
-        {/* Model with Search */}
+        {/* Model */}
         <div className="relative">
           <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
             Model *
@@ -321,15 +327,12 @@ export const CarFormPage = () => {
                 onChange={(e) => {
                   setModelSearch(e.target.value);
                   setFormData(prev => ({ ...prev, model: e.target.value }));
-                  if (models.length > 0) {
-                    setShowModelDropdown(true);
-                  }
+                  if (models.length > 0) setShowModelDropdown(true);
                 }}
                 onFocus={() => models.length > 0 && setShowModelDropdown(true)}
-                className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))] pr-10"
+                className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] pr-10 focus:border-[rgb(var(--primary))] focus:ring-2 focus:ring-[rgb(var(--primary))]/20 transition-all disabled:opacity-50"
                 placeholder={formData.brand ? "Vyberte nebo zadejte model..." : "Nejdřív vyberte značku"}
                 disabled={!formData.brand}
-                required
               />
               {loadingModels ? (
                 <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 animate-spin text-[rgb(var(--muted-foreground))]" />
@@ -341,7 +344,7 @@ export const CarFormPage = () => {
               type="button"
               onClick={searchCarSpecs}
               disabled={!formData.brand || !formData.model}
-              className="px-4 bg-[rgb(var(--primary))] text-white rounded-lg disabled:opacity-50 flex items-center justify-center"
+              className="px-4 bg-[rgb(var(--primary))] text-white rounded-xl disabled:opacity-50 flex items-center justify-center hover:opacity-90 transition-opacity"
               title="Načíst specifikace"
             >
               <Search className="w-5 h-5" />
@@ -349,13 +352,13 @@ export const CarFormPage = () => {
           </div>
           
           {showModelDropdown && filteredModels.length > 0 && (
-            <div className="absolute z-20 w-full mt-1 bg-[rgb(var(--card))] rounded-lg border border-[rgb(var(--border))] shadow-xl max-h-60 overflow-y-auto">
+            <div className="absolute z-30 w-full mt-2 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] shadow-xl max-h-60 overflow-y-auto">
               {filteredModels.map((model) => (
                 <button
                   key={model}
                   type="button"
                   onClick={() => selectModel(model)}
-                  className="w-full px-4 py-3 text-left hover:bg-[rgb(var(--secondary))] flex items-center justify-between"
+                  className="w-full px-4 py-3 text-left hover:bg-[rgb(var(--secondary))] flex items-center justify-between transition-colors"
                 >
                   <span>{model}</span>
                   {formData.model === model && <Check className="w-4 h-4 text-[rgb(var(--primary))]" />}
@@ -367,21 +370,49 @@ export const CarFormPage = () => {
 
         {/* Year */}
         <div>
-          <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">Rok výroby *</label>
+          <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
+            Rok výroby *
+          </label>
           <input
             type="number"
             value={formData.year}
             onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-            className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))]"
+            className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] focus:border-[rgb(var(--primary))] focus:ring-2 focus:ring-[rgb(var(--primary))]/20 transition-all"
             min="1900"
             max={new Date().getFullYear() + 1}
             required
           />
         </div>
 
-        {/* Transmission - Visual Selection */}
+        {/* Body Type */}
         <div>
-          <label className="block text-sm font-medium mb-3 text-[rgb(var(--muted-foreground))]">Převodovka</label>
+          <label className="block text-sm font-medium mb-3 text-[rgb(var(--muted-foreground))]">
+            Typ karoserie
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            {BODY_TYPES.map((body) => (
+              <button
+                key={body.id}
+                type="button"
+                onClick={() => setFormData({ ...formData, body_type: body.label })}
+                className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center ${
+                  formData.body_type === body.label
+                    ? 'border-[rgb(var(--primary))] bg-[rgb(var(--primary))]/10'
+                    : 'border-[rgb(var(--border))] bg-[rgb(var(--card))] hover:border-[rgb(var(--muted))]'
+                }`}
+              >
+                <span className="text-2xl mb-1">{body.icon}</span>
+                <span className="text-xs font-medium">{body.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Transmission */}
+        <div>
+          <label className="block text-sm font-medium mb-3 text-[rgb(var(--muted-foreground))]">
+            Převodovka
+          </label>
           <div className="grid grid-cols-2 gap-3">
             {TRANSMISSIONS.map((trans) => (
               <button
@@ -391,7 +422,7 @@ export const CarFormPage = () => {
                 className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center ${
                   formData.transmission === trans.label
                     ? 'border-[rgb(var(--primary))] bg-[rgb(var(--primary))]/10'
-                    : 'border-[rgb(var(--border))] bg-[rgb(var(--card))]'
+                    : 'border-[rgb(var(--border))] bg-[rgb(var(--card))] hover:border-[rgb(var(--muted))]'
                 }`}
               >
                 <span className="text-2xl mb-1">{trans.icon}</span>
@@ -401,9 +432,11 @@ export const CarFormPage = () => {
           </div>
         </div>
 
-        {/* Fuel Type - Visual Selection */}
+        {/* Fuel Type */}
         <div>
-          <label className="block text-sm font-medium mb-3 text-[rgb(var(--muted-foreground))]">Palivo</label>
+          <label className="block text-sm font-medium mb-3 text-[rgb(var(--muted-foreground))]">
+            Palivo
+          </label>
           <div className="grid grid-cols-3 gap-3">
             {FUEL_TYPES.map((fuel) => (
               <button
@@ -413,7 +446,7 @@ export const CarFormPage = () => {
                 className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center ${
                   formData.fuel_type === fuel.label
                     ? 'border-[rgb(var(--primary))] bg-[rgb(var(--primary))]/10'
-                    : 'border-[rgb(var(--border))] bg-[rgb(var(--card))]'
+                    : 'border-[rgb(var(--border))] bg-[rgb(var(--card))] hover:border-[rgb(var(--muted))]'
                 }`}
               >
                 <span className="text-xl mb-1">{fuel.icon}</span>
@@ -423,47 +456,29 @@ export const CarFormPage = () => {
           </div>
         </div>
 
-        {/* Body Type - Visual Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-3 text-[rgb(var(--muted-foreground))]">Karoserie</label>
-          <div className="grid grid-cols-3 gap-3">
-            {BODY_TYPES.map((body) => (
-              <button
-                key={body.id}
-                type="button"
-                onClick={() => setFormData({ ...formData, body_type: body.label })}
-                className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center ${
-                  formData.body_type === body.label
-                    ? 'border-[rgb(var(--primary))] bg-[rgb(var(--primary))]/10'
-                    : 'border-[rgb(var(--border))] bg-[rgb(var(--card))]'
-                }`}
-              >
-                <span className="text-xl mb-1">{body.icon}</span>
-                <span className="text-xs font-medium">{body.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Power */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">Výkon (kW)</label>
+            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
+              Výkon (kW)
+            </label>
             <input
               type="number"
               value={formData.power_kw}
               onChange={(e) => setFormData({ ...formData, power_kw: e.target.value })}
-              className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))]"
+              className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] focus:border-[rgb(var(--primary))] transition-all"
               placeholder="např. 150"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">Výkon (HP)</label>
+            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
+              Výkon (HP)
+            </label>
             <input
               type="number"
               value={formData.power_hp}
               onChange={(e) => setFormData({ ...formData, power_hp: e.target.value })}
-              className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))]"
+              className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] focus:border-[rgb(var(--primary))] transition-all"
               placeholder="např. 200"
             />
           </div>
@@ -472,22 +487,26 @@ export const CarFormPage = () => {
         {/* Color & License Plate */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">Barva</label>
+            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
+              Barva
+            </label>
             <input
               type="text"
               value={formData.color}
               onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-              className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))]"
+              className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] focus:border-[rgb(var(--primary))] transition-all"
               placeholder="např. Černá"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">SPZ</label>
+            <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
+              SPZ
+            </label>
             <input
               type="text"
               value={formData.license_plate}
               onChange={(e) => setFormData({ ...formData, license_plate: e.target.value.toUpperCase() })}
-              className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))]"
+              className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] focus:border-[rgb(var(--primary))] transition-all"
               placeholder="např. 1A2 3456"
             />
           </div>
@@ -495,22 +514,24 @@ export const CarFormPage = () => {
 
         {/* Mileage */}
         <div>
-          <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">Nájezd (km)</label>
+          <label className="block text-sm font-medium mb-2 text-[rgb(var(--muted-foreground))]">
+            Nájezd (km)
+          </label>
           <input
             type="number"
             value={formData.mileage}
             onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
-            className="w-full px-4 py-3 bg-[rgb(var(--input))] rounded-lg border border-[rgb(var(--border))]"
+            className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] focus:border-[rgb(var(--primary))] transition-all"
             placeholder="např. 50000"
           />
         </div>
 
-        {/* Actions */}
+        {/* Submit Button */}
         <div className="space-y-3 pt-4">
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-3 bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold rounded-lg disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-4 bg-gradient-to-r from-[rgb(var(--primary))] to-orange-500 text-white font-semibold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             {saving ? (
               <>
@@ -526,7 +547,7 @@ export const CarFormPage = () => {
             <button
               type="button"
               onClick={handleDelete}
-              className="w-full py-3 bg-red-500/20 text-red-500 font-semibold rounded-lg hover:bg-red-500/30 transition-colors"
+              className="w-full py-4 bg-red-500/10 text-red-500 font-semibold rounded-xl hover:bg-red-500/20 transition-colors"
             >
               Smazat vozidlo
             </button>
