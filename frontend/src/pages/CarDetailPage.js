@@ -122,23 +122,37 @@ export const CarDetailPage = () => {
 
       {/* Quick Stats */}
       <div className="max-w-md mx-auto px-6 -mt-6">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           <div className="bg-[rgb(var(--card))] rounded-xl p-3 text-center shadow-lg">
             <Gauge className="w-5 h-5 mx-auto mb-1 text-[rgb(var(--primary))]" />
-            <p className="text-lg font-bold">{car.power_hp || '-'}</p>
-            <p className="text-xs text-[rgb(var(--muted-foreground))]">HP</p>
+            <p className="text-sm font-bold">{car.power_hp || '-'}</p>
+            <p className="text-xs text-[rgb(var(--muted-foreground)))]">HP</p>
           </div>
           <div className="bg-[rgb(var(--card))] rounded-xl p-3 text-center shadow-lg">
             <Fuel className="w-5 h-5 mx-auto mb-1 text-orange-500" />
-            <p className="text-sm font-bold">{car.fuel_type || '-'}</p>
-            <p className="text-xs text-[rgb(var(--muted-foreground))]">Palivo</p>
+            <p className="text-xs font-bold">{car.fuel_type || '-'}</p>
+            <p className="text-xs text-[rgb(var(--muted-foreground)))]">Palivo</p>
           </div>
           <div className="bg-[rgb(var(--card))] rounded-xl p-3 text-center shadow-lg">
             <Car className="w-5 h-5 mx-auto mb-1 text-blue-500" />
-            <p className="text-sm font-bold">{car.mileage ? `${(car.mileage / 1000).toFixed(0)}k` : '-'}</p>
-            <p className="text-xs text-[rgb(var(--muted-foreground))]">km</p>
+            <p className="text-xs font-bold">{car.transmission?.slice(0,4) || '-'}</p>
+            <p className="text-xs text-[rgb(var(--muted-foreground)))]">Převod.</p>
+          </div>
+          <div className="bg-[rgb(var(--card))] rounded-xl p-3 text-center shadow-lg">
+            <Gauge className="w-5 h-5 mx-auto mb-1 text-green-500" />
+            <p className="text-xs font-bold">{car.mileage ? `${(car.mileage / 1000).toFixed(0)}k` : '-'}</p>
+            <p className="text-xs text-[rgb(var(--muted-foreground)))]">km</p>
           </div>
         </div>
+        
+        {/* Body type badge */}
+        {car.body_type && (
+          <div className="mt-3 flex justify-center">
+            <span className="px-3 py-1 bg-[rgb(var(--secondary))] rounded-full text-sm">
+              {car.body_type}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
