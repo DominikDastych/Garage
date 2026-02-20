@@ -73,6 +73,7 @@ class CarCreate(BaseModel):
     power_hp: Optional[int] = None
     fuel_type: Optional[str] = None
     transmission: Optional[str] = None
+    body_type: Optional[str] = None
     image: Optional[str] = None  # Base64 or URL
     color: Optional[str] = None
     license_plate: Optional[str] = None
@@ -88,6 +89,7 @@ class Car(BaseModel):
     power_hp: Optional[int] = None
     fuel_type: Optional[str] = None
     transmission: Optional[str] = None
+    body_type: Optional[str] = None
     image: Optional[str] = None
     color: Optional[str] = None
     license_plate: Optional[str] = None
