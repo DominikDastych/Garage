@@ -313,7 +313,43 @@ async def get_car_makes():
 
 @api_router.get("/cars/models/{make}")
 async def get_car_models(make: str):
-    """Get models for a specific make using API-Ninjas"""
+    """Get models for a specific make using API-Ninjas with fallback"""
+    
+    # Predefined models for popular makes (fallback)
+    fallback_models = {
+        "Audi": ["A1", "A3", "A4", "A5", "A6", "A7", "A8", "Q2", "Q3", "Q5", "Q7", "Q8", "TT", "R8", "RS3", "RS4", "RS5", "RS6", "RS7", "e-tron"],
+        "BMW": ["1 Series", "2 Series", "3 Series", "4 Series", "5 Series", "6 Series", "7 Series", "8 Series", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "Z4", "i3", "i4", "iX", "M2", "M3", "M4", "M5", "M8"],
+        "Mercedes-Benz": ["A-Class", "B-Class", "C-Class", "E-Class", "S-Class", "CLA", "CLS", "GLA", "GLB", "GLC", "GLE", "GLS", "AMG GT", "EQC", "EQS"],
+        "Volkswagen": ["Polo", "Golf", "Passat", "Arteon", "Tiguan", "Touareg", "T-Cross", "T-Roc", "ID.3", "ID.4", "ID.5", "Jetta", "Beetle"],
+        "Skoda": ["Fabia", "Scala", "Octavia", "Superb", "Kamiq", "Karoq", "Kodiaq", "Enyaq", "Citigo"],
+        "Toyota": ["Yaris", "Corolla", "Camry", "RAV4", "C-HR", "Highlander", "Land Cruiser", "Supra", "GR86", "Prius", "bZ4X", "Aygo"],
+        "Honda": ["Jazz", "Civic", "Accord", "CR-V", "HR-V", "e", "NSX", "City"],
+        "Ford": ["Fiesta", "Focus", "Mondeo", "Mustang", "Puma", "Kuga", "Explorer", "Ranger", "F-150", "Bronco", "Mach-E"],
+        "Hyundai": ["i10", "i20", "i30", "Elantra", "Sonata", "Tucson", "Santa Fe", "Kona", "Ioniq", "Ioniq 5", "Ioniq 6"],
+        "Kia": ["Picanto", "Rio", "Ceed", "Forte", "Optima", "Stinger", "Sportage", "Sorento", "EV6", "Niro"],
+        "Mazda": ["2", "3", "6", "CX-3", "CX-30", "CX-5", "CX-9", "MX-5", "MX-30"],
+        "Nissan": ["Micra", "Juke", "Qashqai", "X-Trail", "Leaf", "Ariya", "370Z", "GT-R"],
+        "Peugeot": ["208", "308", "508", "2008", "3008", "5008", "e-208", "e-2008"],
+        "Renault": ["Clio", "Megane", "Captur", "Kadjar", "Koleos", "Zoe", "Twingo", "Arkana"],
+        "Volvo": ["XC40", "XC60", "XC90", "S60", "S90", "V60", "V90", "C40"],
+        "Porsche": ["911", "718 Cayman", "718 Boxster", "Panamera", "Cayenne", "Macan", "Taycan"],
+        "Ferrari": ["Roma", "Portofino", "F8 Tributo", "SF90 Stradale", "812 Superfast", "296 GTB", "Purosangue"],
+        "Lamborghini": ["Huracán", "Aventador", "Urus", "Revuelto"],
+        "Tesla": ["Model 3", "Model Y", "Model S", "Model X", "Cybertruck", "Roadster"],
+        "Jaguar": ["XE", "XF", "F-Type", "E-Pace", "F-Pace", "I-Pace"],
+        "Land Rover": ["Defender", "Discovery", "Discovery Sport", "Range Rover", "Range Rover Sport", "Range Rover Velar", "Range Rover Evoque"],
+        "Jeep": ["Renegade", "Compass", "Cherokee", "Grand Cherokee", "Wrangler", "Gladiator"],
+        "Subaru": ["Impreza", "Legacy", "Outback", "Forester", "XV", "BRZ", "WRX"],
+        "Lexus": ["IS", "ES", "LS", "NX", "RX", "UX", "LC", "LX"],
+        "Seat": ["Ibiza", "Leon", "Arona", "Ateca", "Tarraco", "Cupra Formentor"],
+        "Opel": ["Corsa", "Astra", "Insignia", "Crossland", "Grandland", "Mokka"],
+        "Citroën": ["C1", "C3", "C4", "C5 X", "Berlingo", "C3 Aircross", "C5 Aircross"],
+        "Fiat": ["500", "Panda", "Tipo", "500X", "500L"],
+        "Alfa Romeo": ["Giulia", "Stelvio", "Tonale", "Giulietta"],
+        "Maserati": ["Ghibli", "Quattroporte", "Levante", "MC20", "Grecale"],
+    }
+    
+    # Try API-Ninjas first
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -325,12 +361,24 @@ async def get_car_models(make: str):
             
             if response.status_code == 200:
                 cars = response.json()
-                # Extract unique models
-                models = list(set(car.get("model", "") for car in cars if car.get("model")))
-                models.sort()
-                return {"models": models}
+                if cars:
+                    # Extract unique models
+                    models = list(set(car.get("model", "") for car in cars if car.get("model")))
+                    models.sort()
+                    if models:
+                        return {"models": models}
     except Exception as e:
-        logger.error(f"Error fetching models: {e}")
+        logger.error(f"Error fetching models from API: {e}")
+    
+    # Fallback to predefined models
+    make_normalized = make.strip()
+    if make_normalized in fallback_models:
+        return {"models": fallback_models[make_normalized]}
+    
+    # Try case-insensitive match
+    for key, models in fallback_models.items():
+        if key.lower() == make_normalized.lower():
+            return {"models": models}
     
     return {"models": []}
 
