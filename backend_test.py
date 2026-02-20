@@ -11,7 +11,7 @@ from datetime import datetime
 import uuid
 
 # API Base URL from frontend/.env
-API_BASE_URL = "https://bug-tracker-51.preview.emergentagent.com/api"
+API_BASE_URL = "https://car-garage-debug.preview.emergentagent.com/api"
 
 class CarGarageAPITester:
     def __init__(self):
