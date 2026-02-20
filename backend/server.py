@@ -292,16 +292,202 @@ async def search_cars(make: str, model: Optional[str] = None, year: Optional[int
 
 @api_router.get("/cars/makes")
 async def get_car_makes():
-    """Get list of popular car makes"""
+    """Get list of all car makes"""
     return {
         "makes": [
-            "Audi", "BMW", "Chevrolet", "Dodge", "Ferrari", "Ford", "Honda", 
-            "Hyundai", "Jaguar", "Jeep", "Kia", "Lamborghini", "Land Rover",
-            "Lexus", "Maserati", "Mazda", "Mercedes-Benz", "Mini", "Mitsubishi",
-            "Nissan", "Opel", "Peugeot", "Porsche", "Renault", "Seat", "Skoda",
-            "Subaru", "Tesla", "Toyota", "Volkswagen", "Volvo"
+            "Acura", "Alfa Romeo", "Aston Martin", "Audi", "Bentley", "BMW", 
+            "Bugatti", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Citroën",
+            "Dacia", "Daewoo", "Daihatsu", "Dodge", "Ferrari", "Fiat", "Ford", 
+            "Genesis", "GMC", "Honda", "Hummer", "Hyundai", "Infiniti", "Isuzu",
+            "Jaguar", "Jeep", "Kia", "Koenigsegg", "Lamborghini", "Lancia", 
+            "Land Rover", "Lexus", "Lincoln", "Lotus", "Lucid", "Maserati", 
+            "Maybach", "Mazda", "McLaren", "Mercedes-Benz", "Mercury", "Mini", 
+            "Mitsubishi", "Nissan", "Opel", "Pagani", "Peugeot", "Plymouth",
+            "Polestar", "Pontiac", "Porsche", "Ram", "Renault", "Rivian",
+            "Rolls-Royce", "Saab", "Saturn", "Scion", "Seat", "Skoda", "Smart",
+            "Subaru", "Suzuki", "Tesla", "Toyota", "Volkswagen", "Volvo"
         ]
     }
+
+@api_router.get("/cars/models/{make}")
+async def get_car_models(make: str):
+    """Get models for a specific make using API-Ninjas"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                API_NINJAS_URL,
+                headers={"X-Api-Key": API_NINJAS_KEY},
+                params={"make": make, "limit": 50},
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                cars = response.json()
+                # Extract unique models
+                models = list(set(car.get("model", "") for car in cars if car.get("model")))
+                models.sort()
+                return {"models": models}
+    except Exception as e:
+        logger.error(f"Error fetching models: {e}")
+    
+    return {"models": []}
+
+@api_router.get("/cars/specs")
+async def get_car_specs(make: str, model: str, year: Optional[int] = None):
+    """Get detailed specs for a specific car"""
+    try:
+        params = {"make": make, "model": model}
+        if year:
+            params["year"] = year
+            
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                API_NINJAS_URL,
+                headers={"X-Api-Key": API_NINJAS_KEY},
+                params=params,
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                cars = response.json()
+                if cars:
+                    car = cars[0]
+                    return {
+                        "make": car.get("make", make),
+                        "model": car.get("model", model),
+                        "year": car.get("year"),
+                        "fuel_type": car.get("fuel_type", ""),
+                        "transmission": "Automatická" if car.get("transmission") == "a" else "Manuální" if car.get("transmission") == "m" else "",
+                        "drive": car.get("drive", ""),
+                        "cylinders": car.get("cylinders"),
+                        "displacement": car.get("displacement"),
+                        "class": car.get("class", "")
+                    }
+    except Exception as e:
+        logger.error(f"Error fetching specs: {e}")
+    
+    return None
+
+@api_router.get("/cars/image")
+async def get_car_image(make: str, model: str):
+    """Get car image URL based on make and model"""
+    # Curated car images from Unsplash by brand
+    car_images = {
+        "audi": [
+            "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800",
+            "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800",
+        ],
+        "bmw": [
+            "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "mercedes": [
+            "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+        ],
+        "porsche": [
+            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
+            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800",
+        ],
+        "ferrari": [
+            "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800",
+            "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800",
+        ],
+        "lamborghini": [
+            "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800",
+            "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=800",
+        ],
+        "tesla": [
+            "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800",
+            "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800",
+        ],
+        "ford": [
+            "https://images.unsplash.com/photo-1551830820-330a71b99659?w=800",
+            "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800",
+        ],
+        "chevrolet": [
+            "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
+            "https://images.unsplash.com/photo-1612544448445-b8232cff3b6c?w=800",
+        ],
+        "toyota": [
+            "https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=800",
+            "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800",
+        ],
+        "honda": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
+        ],
+        "volkswagen": [
+            "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800",
+            "https://images.unsplash.com/photo-1591840572042-09d0ffdd73f7?w=800",
+        ],
+        "skoda": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
+        ],
+        "mazda": [
+            "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800",
+            "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800",
+        ],
+        "nissan": [
+            "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800",
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+        ],
+        "hyundai": [
+            "https://images.unsplash.com/photo-1629897048514-3dd7414fe72a?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "kia": [
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+        ],
+        "volvo": [
+            "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
+            "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800",
+        ],
+        "jaguar": [
+            "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+        ],
+        "land rover": [
+            "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800",
+            "https://images.unsplash.com/photo-1519245659620-e859806a8d3b?w=800",
+        ],
+        "jeep": [
+            "https://images.unsplash.com/photo-1519245659620-e859806a8d3b?w=800",
+            "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800",
+        ],
+        "subaru": [
+            "https://images.unsplash.com/photo-1626668893632-6f3a4466d22f?w=800",
+            "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800",
+        ],
+        "lexus": [
+            "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+        ],
+        "maserati": [
+            "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
+            "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800",
+        ],
+        "default": [
+            "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800",
+            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
+            "https://images.unsplash.com/photo-1542362567-b07e54358753?w=800",
+        ]
+    }
+    
+    # Normalize make name
+    make_lower = make.lower().replace("-", " ").replace("_", " ")
+    
+    # Find matching images
+    images = car_images.get(make_lower, car_images.get("default"))
+    
+    # Use model to select image variant
+    import hashlib
+    hash_val = int(hashlib.md5(f"{make}{model}".encode()).hexdigest(), 16)
+    image_url = images[hash_val % len(images)]
+    
+    return {"image_url": image_url}
 
 # -------------- CARS CRUD --------------
 
