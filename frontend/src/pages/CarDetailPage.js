@@ -64,11 +64,13 @@ export const CarDetailPage = () => {
     
     setDeleting(true);
     try {
+      console.log('Deleting car with id:', id);
       await carsApi.delete(id);
+      console.log('Car deleted successfully');
       navigate('/dashboard');
     } catch (err) {
       console.error('Error deleting car:', err);
-      alert('Nepodařilo se smazat vozidlo');
+      alert('Nepodařilo se smazat vozidlo: ' + err.message);
       setDeleting(false);
     }
   };
