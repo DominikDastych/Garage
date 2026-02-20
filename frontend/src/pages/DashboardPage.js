@@ -5,7 +5,7 @@ import { carsApi, statsApi } from '../services/api';
 import { BottomNav } from '../components/BottomNav';
 import { Car, Plus, Fuel, Gauge, Loader2, ChevronRight, Settings, Wallet } from 'lucide-react';
 
-const DEFAULT_CAR_IMAGE = 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=400';
+const DEFAULT_CAR_IMAGE = 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
