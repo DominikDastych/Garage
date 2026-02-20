@@ -65,12 +65,13 @@ export const CarDetailPage = () => {
     setDeleting(true);
     try {
       console.log('Deleting car with id:', id);
-      await carsApi.delete(id);
-      console.log('Car deleted successfully');
-      navigate('/dashboard');
+      const result = await carsApi.delete(id);
+      console.log('Car deleted successfully:', result);
+      // Redirect to dashboard after successful deletion
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       console.error('Error deleting car:', err);
-      alert('Nepodařilo se smazat vozidlo: ' + err.message);
+      alert('Nepodařilo se smazat vozidlo: ' + (err.message || 'Neznámá chyba'));
       setDeleting(false);
     }
   };
