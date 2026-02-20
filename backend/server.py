@@ -420,74 +420,16 @@ async def get_car_specs(make: str, model: str, year: Optional[int] = None):
 
 @api_router.get("/cars/image")
 async def get_car_image(make: str, model: str, body_type: Optional[str] = None):
-    """Get car image URL based on make, model and body type"""
+    """Get car image URL based on make, model using Unsplash search"""
     
-    # Better organized images by brand with actual car photos
-    brand_images = {
-        "audi": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800",
-        "bmw": "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
-        "mercedes-benz": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
-        "mercedes": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
-        "volkswagen": "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800",
-        "skoda": "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800",
-        "toyota": "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800",
-        "honda": "https://images.unsplash.com/photo-1606611013016-969c19ba27bb?w=800",
-        "ford": "https://images.unsplash.com/photo-1551830820-330a71b99659?w=800",
-        "porsche": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
-        "ferrari": "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800",
-        "lamborghini": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800",
-        "tesla": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800",
-        "mazda": "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800",
-        "hyundai": "https://images.unsplash.com/photo-1629897048514-3dd7414fe72a?w=800",
-        "kia": "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
-        "volvo": "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
-        "jaguar": "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
-        "land rover": "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800",
-        "jeep": "https://images.unsplash.com/photo-1519245659620-e859806a8d3b?w=800",
-        "subaru": "https://images.unsplash.com/photo-1626668893632-6f3a4466d22f?w=800",
-        "nissan": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "peugeot": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "renault": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "opel": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "seat": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "fiat": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "citroen": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "dacia": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "mini": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "lexus": "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
-        "alfa romeo": "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
-        "maserati": "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
-        "chevrolet": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
-    }
+    # Search query for specific car make and model
+    search_query = f"{make} {model} car".replace(" ", "+")
     
-    # Images by body type as fallback
-    body_images = {
-        "sedan": "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800",
-        "hatchback": "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
-        "kombi": "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
-        "suv": "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800",
-        "coupe": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800",
-        "cabrio": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
-    }
+    # Use Unsplash source URL for dynamic images based on make and model
+    # This generates a consistent image URL based on the search query
+    image_url = f"https://source.unsplash.com/800x600/?{search_query}"
     
-    # Default image
-    default_image = "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800"
-    
-    # Try to find by brand
-    make_lower = make.lower().strip()
-    
-    for brand_key, image_url in brand_images.items():
-        if brand_key in make_lower or make_lower in brand_key:
-            return {"image_url": image_url}
-    
-    # Try by body type
-    if body_type:
-        body_lower = body_type.lower().strip()
-        for body_key, image_url in body_images.items():
-            if body_key in body_lower or body_lower in body_key:
-                return {"image_url": image_url}
-    
-    return {"image_url": default_image}
+    return {"image_url": image_url}
 
 # -------------- CARS CRUD --------------
 
