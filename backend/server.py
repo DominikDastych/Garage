@@ -426,18 +426,27 @@ async def get_car_image(make: str, model: str):
         "audi": [
             "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800",
             "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800",
+            "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800",
         ],
         "bmw": [
             "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800",
             "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+            "https://images.unsplash.com/photo-1556189250-72ba954cfc2b?w=800",
         ],
         "mercedes": [
             "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
             "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=800",
+        ],
+        "mercedes-benz": [
+            "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800",
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=800",
         ],
         "porsche": [
             "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
             "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800",
+            "https://images.unsplash.com/photo-1611821064430-0d40291d0f0b?w=800",
         ],
         "ferrari": [
             "https://images.unsplash.com/photo-1592198084033-aade902d1aae?w=800",
@@ -450,10 +459,12 @@ async def get_car_image(make: str, model: str):
         "tesla": [
             "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800",
             "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800",
+            "https://images.unsplash.com/photo-1562911791-c7a97b729ec5?w=800",
         ],
         "ford": [
             "https://images.unsplash.com/photo-1551830820-330a71b99659?w=800",
             "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800",
+            "https://images.unsplash.com/photo-1612544448445-b8232cff3b6c?w=800",
         ],
         "chevrolet": [
             "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800",
@@ -462,18 +473,21 @@ async def get_car_image(make: str, model: str):
         "toyota": [
             "https://images.unsplash.com/photo-1559416523-140ddc3d238c?w=800",
             "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=800",
+            "https://images.unsplash.com/photo-1629897048514-3dd7414fe72a?w=800",
         ],
         "honda": [
-            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1606611013016-969c19ba27bb?w=800",
             "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
         ],
         "volkswagen": [
             "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800",
             "https://images.unsplash.com/photo-1591840572042-09d0ffdd73f7?w=800",
+            "https://images.unsplash.com/photo-1615063029087-47dc2ea98e83?w=800",
         ],
         "skoda": [
             "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
             "https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800",
+            "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800",
         ],
         "mazda": [
             "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800",
@@ -497,7 +511,7 @@ async def get_car_image(make: str, model: str):
         ],
         "jaguar": [
             "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
-            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1612544448445-b8232cff3b6c?w=800",
         ],
         "land rover": [
             "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800",
@@ -519,6 +533,46 @@ async def get_car_image(make: str, model: str):
             "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
             "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800",
         ],
+        "peugeot": [
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+        ],
+        "renault": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "citroen": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "citroën": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "fiat": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "alfa romeo": [
+            "https://images.unsplash.com/photo-1597007066704-67bf2068d527?w=800",
+            "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800",
+        ],
+        "seat": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "opel": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "dacia": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
+        "mini": [
+            "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800",
+            "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800",
+        ],
         "default": [
             "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800",
             "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800",
@@ -527,12 +581,26 @@ async def get_car_image(make: str, model: str):
     }
     
     # Normalize make name
-    make_lower = make.lower().replace("-", " ").replace("_", " ")
+    make_lower = make.lower().replace("-", " ").replace("_", " ").strip()
     
     # Find matching images
-    images = car_images.get(make_lower, car_images.get("default"))
+    images = None
     
-    # Use model to select image variant
+    # Try exact match first
+    if make_lower in car_images:
+        images = car_images[make_lower]
+    else:
+        # Try partial match
+        for key in car_images:
+            if key in make_lower or make_lower in key:
+                images = car_images[key]
+                break
+    
+    # Fallback to default
+    if not images:
+        images = car_images["default"]
+    
+    # Use model to select image variant for variety
     import hashlib
     hash_val = int(hashlib.md5(f"{make}{model}".encode()).hexdigest(), 16)
     image_url = images[hash_val % len(images)]
