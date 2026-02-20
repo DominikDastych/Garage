@@ -143,11 +143,21 @@ export const carsApi = {
   },
 
   async delete(id) {
+    console.log('API: Deleting car', id);
+    console.log('API: Token exists:', !!getToken());
+    
     const res = await fetch(`${API_URL}/api/cars/${id}`, {
       method: 'DELETE',
       headers: headers()
     });
-    if (!res.ok) throw new Error('Failed to delete car');
+    
+    console.log('API: Delete response status:', res.status);
+    
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('API: Delete error:', errorText);
+      throw new Error(`Failed to delete car: ${res.status}`);
+    }
     return res.json();
   },
 
