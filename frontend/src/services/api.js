@@ -88,6 +88,28 @@ export const carsApi = {
     return res.json();
   },
 
+  async getModels(make) {
+    const res = await fetch(`${API_URL}/api/cars/models/${encodeURIComponent(make)}`);
+    if (!res.ok) return { models: [] };
+    return res.json();
+  },
+
+  async getSpecs(make, model, year) {
+    const params = new URLSearchParams({ make, model });
+    if (year) params.append('year', year);
+    
+    const res = await fetch(`${API_URL}/api/cars/specs?${params}`);
+    if (!res.ok) return null;
+    return res.json();
+  },
+
+  async getImage(make, model) {
+    const params = new URLSearchParams({ make, model });
+    const res = await fetch(`${API_URL}/api/cars/image?${params}`);
+    if (!res.ok) return null;
+    return res.json();
+  },
+
   async getAll() {
     const res = await fetch(`${API_URL}/api/cars`, { headers: headers() });
     if (!res.ok) throw new Error('Failed to get cars');
