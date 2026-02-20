@@ -120,9 +120,17 @@ export const CarDetailPage = () => {
         {/* Edit Button */}
         <button
           onClick={() => navigate(`/car/${id}/edit`)}
-          className="absolute top-4 right-4 p-2 bg-black/40 backdrop-blur rounded-full"
+          className="absolute top-4 right-14 p-2 bg-black/40 backdrop-blur rounded-full"
         >
           <Edit className="w-5 h-5 text-white" />
+        </button>
+
+        {/* Delete Button */}
+        <button
+          onClick={handleDeleteCar}
+          className="absolute top-4 right-4 p-2 bg-red-500/80 backdrop-blur rounded-full"
+        >
+          <Trash2 className="w-5 h-5 text-white" />
         </button>
 
         {/* Car Info */}
