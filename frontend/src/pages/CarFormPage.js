@@ -190,13 +190,15 @@ export const CarFormPage = () => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Opravdu chcete smazat toto vozidlo?')) return;
+    if (!window.confirm('Opravdu chcete smazat toto vozidlo? Tato akce je nevratná.')) return;
     
     try {
       await carsApi.delete(id);
+      alert('Vozidlo bylo úspěšně smazáno');
       navigate('/dashboard');
     } catch (err) {
       console.error('Error deleting car:', err);
+      alert('Nepodařilo se smazat vozidlo. Zkuste to znovu.');
     }
   };
 
