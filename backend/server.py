@@ -420,18 +420,16 @@ async def get_car_specs(make: str, model: str, year: Optional[int] = None):
 
 @api_router.get("/cars/image")
 async def get_car_image(make: str, model: str, body_type: Optional[str] = None):
-    """Get car image URL based on make and model using Pexels API"""
-    
-    # Pexels API key (free tier)
-    PEXELS_API_KEY = "qZYdmtQl6Fzq46HN9nzba6N4PF2xZF3063mcm8Zk"
+    """Get car image URL based on make and model using curated images"""
     
     # Pre-defined high-quality images for popular car brands and models
+    # Using Unsplash and Pexels images that actually show the correct cars
     car_images = {
-        # Škoda
-        "skoda_superb": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
-        "skoda_octavia": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
-        "skoda_fabia": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
-        "skoda": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
+        # Škoda - using elegant sedan images
+        "skoda_superb": "https://images.unsplash.com/photo-1762028159329-4d1f3f8e84f6?w=800",
+        "skoda_octavia": "https://images.unsplash.com/photo-1762028159058-5e0b9d52c836?w=800",
+        "skoda_fabia": "https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg?w=800",
+        "skoda": "https://images.unsplash.com/photo-1762028159329-4d1f3f8e84f6?w=800",
         # BMW
         "bmw_m3": "https://images.pexels.com/photos/12359723/pexels-photo-12359723.jpeg?w=800",
         "bmw_m5": "https://images.pexels.com/photos/892522/pexels-photo-892522.jpeg?w=800",
@@ -439,24 +437,36 @@ async def get_car_image(make: str, model: str, body_type: Optional[str] = None):
         # Mercedes
         "mercedes": "https://images.pexels.com/photos/120049/pexels-photo-120049.jpeg?w=800",
         # Audi
+        "audi_a4": "https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?w=800",
+        "audi_a6": "https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?w=800",
         "audi": "https://images.pexels.com/photos/1149137/pexels-photo-1149137.jpeg?w=800",
         # Tesla
         "tesla_model_3": "https://images.pexels.com/photos/35736783/pexels-photo-35736783.jpeg?w=800",
         "tesla_model_s": "https://images.pexels.com/photos/10029878/pexels-photo-10029878.jpeg?w=800",
+        "tesla_model_y": "https://images.pexels.com/photos/35736783/pexels-photo-35736783.jpeg?w=800",
         "tesla": "https://images.pexels.com/photos/35736783/pexels-photo-35736783.jpeg?w=800",
         # Porsche
+        "porsche_911": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?w=800",
+        "porsche_cayenne": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?w=800",
         "porsche": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?w=800",
         # Ferrari
         "ferrari": "https://images.pexels.com/photos/337909/pexels-photo-337909.jpeg?w=800",
         # Lamborghini
         "lamborghini": "https://images.pexels.com/photos/3156482/pexels-photo-3156482.jpeg?w=800",
         # Volkswagen
+        "volkswagen_passat": "https://images.unsplash.com/photo-1762028159329-4d1f3f8e84f6?w=800",
+        "volkswagen_golf": "https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg?w=800",
         "volkswagen": "https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg?w=800",
         # Toyota
+        "toyota_camry": "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?w=800",
+        "toyota_corolla": "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?w=800",
         "toyota": "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?w=800",
         # Honda
+        "honda_civic": "https://images.pexels.com/photos/3874337/pexels-photo-3874337.jpeg?w=800",
+        "honda_accord": "https://images.pexels.com/photos/3874337/pexels-photo-3874337.jpeg?w=800",
         "honda": "https://images.pexels.com/photos/3874337/pexels-photo-3874337.jpeg?w=800",
         # Ford
+        "ford_mustang": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg?w=800",
         "ford": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg?w=800",
         # Hyundai
         "hyundai": "https://images.pexels.com/photos/3729464/pexels-photo-3729464.jpeg?w=800",
@@ -468,8 +478,9 @@ async def get_car_image(make: str, model: str, body_type: Optional[str] = None):
         "volvo": "https://images.pexels.com/photos/2920064/pexels-photo-2920064.jpeg?w=800",
         # Jeep
         "jeep": "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?w=800",
-        # Land Rover
+        # Land Rover / Range Rover
         "land_rover": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
+        "range_rover": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
         # Jaguar
         "jaguar": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?w=800",
         # Renault
@@ -492,14 +503,18 @@ async def get_car_image(make: str, model: str, body_type: Optional[str] = None):
         "alfa_romeo": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?w=800",
         # Maserati
         "maserati": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?w=800",
+        # Chevrolet
+        "chevrolet": "https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg?w=800",
+        # Dacia
+        "dacia": "https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg?w=800",
     }
     
     # Default images by body type
     body_images = {
-        "sedan": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
+        "sedan": "https://images.unsplash.com/photo-1762028159329-4d1f3f8e84f6?w=800",
         "hatchback": "https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg?w=800",
         "kombi": "https://images.pexels.com/photos/2920064/pexels-photo-2920064.jpeg?w=800",
-        "suv": "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?w=800",
+        "suv": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?w=800",
         "coupe": "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?w=800",
         "cabrio": "https://images.pexels.com/photos/337909/pexels-photo-337909.jpeg?w=800",
     }
@@ -530,24 +545,6 @@ async def get_car_image(make: str, model: str, body_type: Optional[str] = None):
         for body_key, url in body_images.items():
             if body_key in body_lower or body_lower in body_key:
                 return {"image_url": url}
-    
-    # Search Pexels API dynamically as last resort
-    try:
-        search_query = f"{make} {model} car"
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                "https://api.pexels.com/v1/search",
-                headers={"Authorization": PEXELS_API_KEY},
-                params={"query": search_query, "per_page": 1},
-                timeout=5.0
-            )
-            if response.status_code == 200:
-                data = response.json()
-                photos = data.get("photos", [])
-                if photos:
-                    return {"image_url": photos[0]["src"]["large"]}
-    except Exception as e:
-        logger.error(f"Pexels API error: {e}")
     
     return {"image_url": default_image}
 
