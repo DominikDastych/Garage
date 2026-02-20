@@ -25,15 +25,15 @@ const BODY_TYPES = [
   { id: 'cabrio', label: 'Cabrio', icon: '🛻' },
 ];
 
-// Predefined car images by type
+// Predefined car images by type - generic photos without visible brand
 const CAR_IMAGES = {
-  sedan: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800',
-  hatchback: 'https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800',
-  kombi: 'https://images.unsplash.com/photo-1619682817481-e994891cd1f5?w=800',
-  suv: 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800',
-  coupe: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800',
-  cabrio: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800',
-  default: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800',
+  sedan: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800',
+  hatchback: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
+  kombi: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800',
+  suv: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800',
+  coupe: 'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=800',
+  cabrio: 'https://images.unsplash.com/photo-1501066927591-314112b5888e?w=800',
+  default: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800',
 };
 
 export const CarFormPage = () => {
