@@ -63,6 +63,18 @@ export const CarDetailPage = () => {
     }
   };
 
+  const handleDeleteCar = async () => {
+    if (!window.confirm('Opravdu chcete smazat toto vozidlo? Všechny servisní záznamy budou také smazány. Tato akce je nevratná.')) return;
+    try {
+      await carsApi.delete(id);
+      alert('Vozidlo bylo úspěšně smazáno');
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error deleting car:', err);
+      alert('Nepodařilo se smazat vozidlo. Zkuste to znovu.');
+    }
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('cs-CZ', {
       style: 'currency',
