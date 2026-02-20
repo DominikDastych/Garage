@@ -84,9 +84,33 @@ export const CarFormPage = () => {
     }
   }, [formData.brand]);
 
-  // Set default image based on body type
+  // Fetch car image when brand and model are selected
   useEffect(() => {
-    if (formData.body_type && !formData.image) {
+    const fetchCarImage = async () => {
+      if (formData.brand && formData.model) {
+        try {
+          const imageData = await carsApi.getImage(formData.brand, formData.model);
+          if (imageData && imageData.image_url) {
+            setFormData(prev => ({ ...prev, image: imageData.image_url }));
+          }
+        } catch (err) {
+          console.error('Error fetching car image:', err);
+          // Use body type fallback if image fetch fails
+          if (formData.body_type) {
+            const bodyKey = formData.body_type.toLowerCase();
+            const fallbackUrl = CAR_IMAGES[bodyKey] || CAR_IMAGES.default;
+            setFormData(prev => ({ ...prev, image: fallbackUrl }));
+          }
+        }
+      }
+    };
+    
+    fetchCarImage();
+  }, [formData.brand, formData.model]);
+
+  // Set default image based on body type (fallback)
+  useEffect(() => {
+    if (formData.body_type && !formData.image && !formData.brand) {
       const bodyKey = formData.body_type.toLowerCase();
       const imageUrl = CAR_IMAGES[bodyKey] || CAR_IMAGES.default;
       setFormData(prev => ({ ...prev, image: imageUrl }));
