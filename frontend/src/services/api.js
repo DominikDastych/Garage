@@ -143,12 +143,22 @@ export const carsApi = {
   },
 
   async delete(id) {
+    const token = getToken();
+    
+    if (!token) {
+      console.error('API: No auth token found');
+      throw new Error('Not authenticated');
+    }
+    
     console.log('API: Deleting car', id);
-    console.log('API: Token exists:', !!getToken());
+    console.log('API: Token exists:', !!token);
     
     const res = await fetch(`${API_URL}/api/cars/${id}`, {
       method: 'DELETE',
-      headers: headers()
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     });
     
     console.log('API: Delete response status:', res.status);
@@ -158,7 +168,10 @@ export const carsApi = {
       console.error('API: Delete error:', errorText);
       throw new Error(`Failed to delete car: ${res.status}`);
     }
-    return res.json();
+    
+    const data = await res.json();
+    console.log('API: Delete success:', data);
+    return data;
   },
 
   async getStats(id) {
