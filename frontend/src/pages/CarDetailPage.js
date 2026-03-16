@@ -49,13 +49,40 @@ export const CarDetailPage = () => {
   const handleDeleteService = async (serviceId) => {
     if (!window.confirm('Smazat tento servisní záznam?')) return;
     try {
-      await servicesApi.delete(serviceId);
-      setServices(prev => prev.filter(s => s.id !== serviceId));
-      const statsData = await carsApi.getStats(id);
-      setStats(statsData);
+      const token = localStorage.getItem('car_garage_token');
+      if (!token) {
+        alert('Nejste přihlášeni. Přihlaste se znovu.');
+        window.location.href = '/login';
+        return;
+      }
+      
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      const response = await fetch(`${API_URL}/api/services/${serviceId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        setServices(prev => prev.filter(s => s.id !== serviceId));
+        const statsData = await carsApi.getStats(id);
+        setStats(statsData);
+      } else if (response.status === 401) {
+        alert('Vaše přihlášení vypršelo. Přihlaste se znovu.');
+        localStorage.removeItem('car_garage_token');
+        localStorage.removeItem('car_garage_user');
+        window.location.href = '/login';
+      } else if (response.status === 404) {
+        alert('Záznam nebyl nalezen. Možná byl již smazán.');
+        setServices(prev => prev.filter(s => s.id !== serviceId));
+      } else {
+        alert('Nepodařilo se smazat záznam. Zkuste to znovu.');
+      }
     } catch (err) {
       console.error('Error deleting service:', err);
-      alert('Nepodařilo se smazat záznam');
+      alert('Chyba připojení. Zkuste to znovu.');
     }
   };
 
@@ -65,7 +92,18 @@ export const CarDetailPage = () => {
     setDeleting(true);
     try {
       const token = localStorage.getItem('car_garage_token');
+      
+      if (!token) {
+        alert('Nejste přihlášeni. Přihlaste se znovu.');
+        window.location.href = '/login';
+        return;
+      }
+      
       const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      
+      console.log('Deleting car:', id);
+      console.log('Token exists:', !!token);
+      console.log('API URL:', API_URL);
       
       const response = await fetch(`${API_URL}/api/cars/${id}`, {
         method: 'DELETE',
@@ -75,15 +113,31 @@ export const CarDetailPage = () => {
         }
       });
       
+      console.log('Delete response status:', response.status);
+      
       if (response.ok) {
-        window.location.href = '/dashboard';
+        // Force page reload to dashboard
+        window.location.replace('/dashboard');
       } else {
-        const error = await response.text();
-        alert('Nepodařilo se smazat vozidlo: ' + error);
-        setDeleting(false);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Delete error:', errorData);
+        
+        if (response.status === 401) {
+          alert('Vaše přihlášení vypršelo. Přihlaste se znovu.');
+          localStorage.removeItem('car_garage_token');
+          localStorage.removeItem('car_garage_user');
+          window.location.href = '/login';
+        } else if (response.status === 404) {
+          alert('Vozidlo nebylo nalezeno. Možná bylo již smazáno.');
+          window.location.replace('/dashboard');
+        } else {
+          alert('Nepodařilo se smazat vozidlo. Zkuste to znovu.');
+          setDeleting(false);
+        }
       }
     } catch (err) {
-      alert('Nepodařilo se smazat vozidlo: ' + (err.message || 'Neznámá chyba'));
+      console.error('Delete error:', err);
+      alert('Chyba připojení. Zkuste to znovu.');
       setDeleting(false);
     }
   };

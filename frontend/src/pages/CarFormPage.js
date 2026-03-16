@@ -262,6 +262,7 @@ export const CarFormPage = () => {
                 }
               }}
               onFocus={() => setShowMakeDropdown(true)}
+              onBlur={() => setTimeout(() => setShowMakeDropdown(false), 200)}
               className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] pr-10 focus:border-[rgb(var(--primary))] focus:ring-2 focus:ring-[rgb(var(--primary))]/20 transition-all"
               placeholder="Vyhledejte značku..."
             />
@@ -301,6 +302,7 @@ export const CarFormPage = () => {
                   if (models.length > 0) setShowModelDropdown(true);
                 }}
                 onFocus={() => models.length > 0 && setShowModelDropdown(true)}
+                onBlur={() => setTimeout(() => setShowModelDropdown(false), 200)}
                 className="w-full px-4 py-3 bg-[rgb(var(--card))] rounded-xl border border-[rgb(var(--border))] pr-10 focus:border-[rgb(var(--primary))] focus:ring-2 focus:ring-[rgb(var(--primary))]/20 transition-all disabled:opacity-50"
                 placeholder={formData.brand ? "Vyberte nebo zadejte model..." : "Nejdřív vyberte značku"}
                 disabled={!formData.brand}
@@ -526,16 +528,7 @@ export const CarFormPage = () => {
         </div>
       </form>
 
-      {/* Click outside to close dropdowns */}
-      {(showMakeDropdown || showModelDropdown) && (
-        <div 
-          className="fixed inset-0 z-10" 
-          onClick={() => {
-            setShowMakeDropdown(false);
-            setShowModelDropdown(false);
-          }}
-        />
-      )}
+      {/* Click outside to close dropdowns - removed as it blocks clicks */}
     </div>
   );
 };

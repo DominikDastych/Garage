@@ -2,11 +2,15 @@ const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 const getToken = () => {
   const token = localStorage.getItem('car_garage_token');
+  console.log('Getting token, exists:', !!token);
   return token;
 };
 
 const headers = () => {
   const token = getToken();
+  if (!token) {
+    console.warn('No auth token found in headers()');
+  }
   return {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` })
@@ -209,11 +213,24 @@ export const servicesApi = {
   },
 
   async delete(recordId) {
+    const token = getToken();
+    if (!token) {
+      throw new Error('Not authenticated');
+    }
+    
     const res = await fetch(`${API_URL}/api/services/${recordId}`, {
       method: 'DELETE',
-      headers: headers()
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     });
-    if (!res.ok) throw new Error('Failed to delete service');
+    
+    if (!res.ok) {
+      const error = await res.text();
+      console.error('Delete service error:', error);
+      throw new Error('Failed to delete service');
+    }
     return res.json();
   }
 };
