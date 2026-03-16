@@ -35,6 +35,7 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 - Add service records (oil change, STK, tires, brakes, etc.)
 - Track costs and mileage
 - View service history per car
+- DELETE service records - WORKING
 
 ### Dashboard
 - Overview of all vehicles (card layout, no images)
@@ -49,13 +50,16 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 
 ## Recent Fixes (2026-03-16)
 1. REMOVED all car images from the app (per user request)
-2. Fixed DELETE car functionality - now uses direct fetch with proper redirect
-3. Simplified car cards without images
+2. Fixed DELETE car functionality - direct fetch with proper Authorization header
+3. Fixed DELETE service record functionality - direct fetch with proper Authorization header
+4. Added better error handling with specific messages for 401/404 errors
+5. Simplified car cards without images
 
 ## Testing Status
-- DELETE car: CONFIRMED WORKING (redirects to dashboard after delete)
+- DELETE car: CONFIRMED WORKING (API returns 200, redirects to dashboard)
+- DELETE service record: CONFIRMED WORKING
 - No images: CONFIRMED (all image components removed)
-- All CRUD operations: WORKING
+- Frontend: 100% tests passed
 
 ## Files Structure
 ```
