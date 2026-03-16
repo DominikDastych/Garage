@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { carsApi } from '../services/api';
-import { ArrowLeft, Search, Loader2, Camera, X, ChevronDown, Check } from 'lucide-react';
+import { ArrowLeft, Search, Loader2, ChevronDown, Check } from 'lucide-react';
 
 const FUEL_TYPES = [
   { id: 'benzin', label: 'Benzín', icon: '⛽' },
@@ -25,17 +25,6 @@ const BODY_TYPES = [
   { id: 'cabrio', label: 'Cabrio', icon: '🛻' },
 ];
 
-// Predefined car images by type - generic photos without visible brand
-const CAR_IMAGES = {
-  sedan: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800',
-  hatchback: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800',
-  kombi: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800',
-  suv: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800',
-  coupe: 'https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=800',
-  cabrio: 'https://images.unsplash.com/photo-1501066927591-314112b5888e?w=800',
-  default: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800',
-};
-
 export const CarFormPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -47,7 +36,6 @@ export const CarFormPage = () => {
   const [models, setModels] = useState([]);
   const [loadingModels, setLoadingModels] = useState(false);
   
-  // Dropdown states
   const [showMakeDropdown, setShowMakeDropdown] = useState(false);
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [makeSearch, setMakeSearch] = useState('');
@@ -64,8 +52,7 @@ export const CarFormPage = () => {
     body_type: '',
     color: '',
     license_plate: '',
-    mileage: '',
-    image: ''
+    mileage: ''
   });
 
   useEffect(() => {
@@ -75,7 +62,6 @@ export const CarFormPage = () => {
     }
   }, [id]);
 
-  // Load models when brand changes
   useEffect(() => {
     if (formData.brand) {
       loadModels(formData.brand);
@@ -83,39 +69,6 @@ export const CarFormPage = () => {
       setModels([]);
     }
   }, [formData.brand]);
-
-  // Fetch car image when brand and model are selected
-  useEffect(() => {
-    const fetchCarImage = async () => {
-      if (formData.brand && formData.model) {
-        try {
-          const imageData = await carsApi.getImage(formData.brand, formData.model);
-          if (imageData && imageData.image_url) {
-            setFormData(prev => ({ ...prev, image: imageData.image_url }));
-          }
-        } catch (err) {
-          console.error('Error fetching car image:', err);
-          // Use body type fallback if image fetch fails
-          if (formData.body_type) {
-            const bodyKey = formData.body_type.toLowerCase();
-            const fallbackUrl = CAR_IMAGES[bodyKey] || CAR_IMAGES.default;
-            setFormData(prev => ({ ...prev, image: fallbackUrl }));
-          }
-        }
-      }
-    };
-    
-    fetchCarImage();
-  }, [formData.brand, formData.model]);
-
-  // Set default image based on body type (fallback)
-  useEffect(() => {
-    if (formData.body_type && !formData.image && !formData.brand) {
-      const bodyKey = formData.body_type.toLowerCase();
-      const imageUrl = CAR_IMAGES[bodyKey] || CAR_IMAGES.default;
-      setFormData(prev => ({ ...prev, image: imageUrl }));
-    }
-  }, [formData.body_type]);
 
   const loadMakes = async () => {
     try {
@@ -154,8 +107,7 @@ export const CarFormPage = () => {
         body_type: car.body_type || '',
         color: car.color || '',
         license_plate: car.license_plate || '',
-        mileage: car.mileage || '',
-        image: car.image || ''
+        mileage: car.mileage || ''
       });
       setMakeSearch(car.brand || '');
       setModelSearch(car.model || '');
@@ -201,7 +153,7 @@ export const CarFormPage = () => {
         power_kw: formData.power_kw ? parseInt(formData.power_kw) : null,
         power_hp: formData.power_hp ? parseInt(formData.power_hp) : null,
         mileage: formData.mileage ? parseInt(formData.mileage) : null,
-        image: formData.image || CAR_IMAGES.default
+        image: null
       };
       
       if (isEdit) {
@@ -223,8 +175,22 @@ export const CarFormPage = () => {
     if (!window.confirm('Opravdu chcete smazat toto vozidlo?\n\nVšechny servisní záznamy budou také smazány.')) return;
     
     try {
-      await carsApi.delete(id);
-      navigate('/dashboard');
+      const token = localStorage.getItem('car_garage_token');
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      
+      const response = await fetch(`${API_URL}/api/cars/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        window.location.href = '/dashboard';
+      } else {
+        alert('Nepodařilo se smazat vozidlo');
+      }
     } catch (err) {
       console.error('Error deleting car:', err);
       alert('Nepodařilo se smazat vozidlo');
@@ -278,25 +244,6 @@ export const CarFormPage = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-6 space-y-6">
-        
-        {/* Car Image Preview */}
-        <div className="relative">
-          <div className="w-full h-48 bg-[rgb(var(--card))] rounded-2xl overflow-hidden">
-            {formData.image ? (
-              <img 
-                src={formData.image} 
-                alt="Car" 
-                className="w-full h-full object-cover"
-                onError={(e) => { e.target.src = CAR_IMAGES.default; }}
-              />
-            ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-[rgb(var(--muted-foreground))]">
-                <Camera className="w-12 h-12 mb-2" />
-                <p className="text-sm">Vyberte typ karoserie pro obrázek</p>
-              </div>
-            )}
-          </div>
-        </div>
 
         {/* Brand */}
         <div className="relative">

@@ -4,33 +4,32 @@
 Mobile-first Progressive Web App for managing personal car garage. Users can track their vehicles, service records, and maintenance costs.
 
 ## Core Requirements
-1. **User Authentication** - Login/Register with JWT tokens
-2. **Car Management** - Full CRUD for vehicles
-3. **Service Records** - Track maintenance history
-4. **Cost Tracking** - Monitor expenses per car and total
-5. **PWA** - Installable on mobile home screen
-6. **Responsive Design** - Dark sporty theme
+1. User Authentication - Login/Register with JWT tokens
+2. Car Management - Full CRUD for vehicles (WITHOUT images)
+3. Service Records - Track maintenance history
+4. Cost Tracking - Monitor expenses per car and total
+5. PWA - Installable on mobile home screen
+6. Responsive Design - Dark sporty theme
 
 ## Tech Stack
-- **Backend**: FastAPI + MongoDB
-- **Frontend**: React + Tailwind CSS
-- **Auth**: JWT tokens
-- **PWA**: manifest.json + service worker ready
+- Backend: FastAPI + MongoDB
+- Frontend: React + Tailwind CSS
+- Auth: JWT tokens
+- PWA: manifest.json + service worker ready
 
-## What's Implemented ✅
+## What's Implemented
 
 ### Authentication
 - User registration with email/password
 - User login with JWT tokens
 - Protected routes and API endpoints
 
-### Car Management
+### Car Management (NO IMAGES)
 - Add new cars with brand/model selection
 - Dropdown autocomplete for 70+ brands
 - Model suggestions based on selected brand
-- Edit and delete cars
+- Edit and DELETE cars - WORKING
 - Body type, fuel type, transmission selection
-- Dynamic car images based on make/model
 
 ### Service Records
 - Add service records (oil change, STK, tires, brakes, etc.)
@@ -38,7 +37,7 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 - View service history per car
 
 ### Dashboard
-- Overview of all vehicles
+- Overview of all vehicles (card layout, no images)
 - Total costs tracking
 - Quick access to add cars
 
@@ -48,56 +47,31 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 - Mobile-first responsive design
 - Bottom navigation (Domů, Přidat, Nastavení)
 
-## API Endpoints
-- `POST /api/auth/register` - Register user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user
-- `GET/POST /api/cars` - List/Create cars
-- `GET/PUT/DELETE /api/cars/{id}` - Get/Update/Delete car
-- `GET /api/cars/makes` - List car makes
-- `GET /api/cars/models/{make}` - Get models for make
-- `GET /api/cars/image` - Get car image URL
-- `GET/POST /api/cars/{id}/services` - Service records
-- `GET /api/stats` - User statistics
-
-## Database Schema
-- **users**: id, email, name, hashed_password, settings
-- **cars**: id, user_id, brand, model, year, image, body_type, fuel_type, etc.
-- **service_records**: id, car_id, user_id, service_type, date, cost, mileage
-
-## Recent Fixes (2026-02-20)
-1. **DELETE Car** - Fixed frontend API call with proper Authorization header
-2. **Car Images** - Replaced broken source.unsplash.com with curated Pexels/Unsplash URLs
-3. **Image Loading** - Added fallback images based on body type
+## Recent Fixes (2026-03-16)
+1. REMOVED all car images from the app (per user request)
+2. Fixed DELETE car functionality - now uses direct fetch with proper redirect
+3. Simplified car cards without images
 
 ## Testing Status
-- Backend: 100% (24/24 tests passed)
-- Frontend: 100% (all flows tested)
-- DELETE functionality: CONFIRMED WORKING
-- Image loading: CONFIRMED WORKING
+- DELETE car: CONFIRMED WORKING (redirects to dashboard after delete)
+- No images: CONFIRMED (all image components removed)
+- All CRUD operations: WORKING
 
 ## Files Structure
 ```
 /app
 ├── backend/
-│   ├── server.py         # FastAPI endpoints
+│   ├── server.py
 │   ├── requirements.txt
 │   └── .env
 └── frontend/
     ├── src/
-    │   ├── pages/        # DashboardPage, CarDetailPage, CarFormPage, etc.
-    │   ├── services/     # api.js
-    │   ├── contexts/     # AuthContext, ThemeContext
-    │   └── components/   # BottomNav, ui components
-    ├── public/
-    │   └── manifest.json # PWA manifest
+    │   ├── pages/
+    │   │   ├── DashboardPage.js (no images)
+    │   │   ├── CarDetailPage.js (no images, working delete)
+    │   │   ├── CarFormPage.js (no images)
+    │   │   └── ...
+    │   ├── services/api.js
+    │   └── contexts/
     └── package.json
 ```
-
-## Future Enhancements (Backlog)
-- [ ] Photo upload for cars
-- [ ] Maintenance reminders/notifications
-- [ ] Export data (PDF/CSV)
-- [ ] Fuel consumption tracking
-- [ ] Multiple garages support
-- [ ] Share vehicle info

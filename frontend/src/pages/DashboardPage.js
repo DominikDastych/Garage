@@ -5,8 +5,6 @@ import { carsApi, statsApi } from '../services/api';
 import { BottomNav } from '../components/BottomNav';
 import { Car, Plus, Fuel, Gauge, Loader2, ChevronRight, Settings, Wallet } from 'lucide-react';
 
-const DEFAULT_CAR_IMAGE = 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400';
-
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -134,40 +132,32 @@ export const DashboardPage = () => {
               <div
                 key={car.id}
                 onClick={() => navigate(`/car/${car.id}`)}
-                className="bg-[rgb(var(--card))] rounded-2xl overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                className="bg-[rgb(var(--card))] rounded-2xl overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow p-4"
               >
-                {/* Car Image */}
-                <div className="relative h-44">
-                  <img
-                    src={car.image || DEFAULT_CAR_IMAGE}
-                    alt={`${car.brand} ${car.model}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.target.src = DEFAULT_CAR_IMAGE; }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                  
-                  {/* Car Title on Image */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-xl font-bold text-white">
-                      {car.brand} {car.model}
-                    </h3>
-                    <p className="text-white/70 text-sm">
-                      {car.year} {car.license_plate && `• ${car.license_plate}`}
-                    </p>
-                  </div>
-
-                  {/* Body Type Badge */}
-                  {car.body_type && (
-                    <div className="absolute top-3 right-3">
-                      <span className="px-2 py-1 bg-black/50 backdrop-blur rounded-lg text-white text-xs">
-                        {car.body_type}
-                      </span>
+                {/* Car Info */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[rgb(var(--primary))]/20 to-orange-500/20 flex items-center justify-center">
+                      <Car className="w-7 h-7 text-[rgb(var(--primary))]" />
                     </div>
+                    <div>
+                      <h3 className="text-lg font-bold">
+                        {car.brand} {car.model}
+                      </h3>
+                      <p className="text-[rgb(var(--muted-foreground))] text-sm">
+                        {car.year} {car.license_plate && `• ${car.license_plate}`}
+                      </p>
+                    </div>
+                  </div>
+                  {car.body_type && (
+                    <span className="px-3 py-1 bg-[rgb(var(--secondary))] rounded-lg text-sm">
+                      {car.body_type}
+                    </span>
                   )}
                 </div>
 
                 {/* Car Details */}
-                <div className="p-4">
+                <div className="mt-4 pt-4 border-t border-[rgb(var(--border))]">
                   <div className="flex items-center justify-between">
                     <div className="flex gap-4">
                       {car.power_hp && (

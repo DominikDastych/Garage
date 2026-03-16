@@ -64,13 +64,25 @@ export const CarDetailPage = () => {
     
     setDeleting(true);
     try {
-      console.log('Deleting car with id:', id);
-      const result = await carsApi.delete(id);
-      console.log('Car deleted successfully:', result);
-      // Redirect to dashboard after successful deletion
-      navigate('/dashboard', { replace: true });
+      const token = localStorage.getItem('car_garage_token');
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      
+      const response = await fetch(`${API_URL}/api/cars/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        window.location.href = '/dashboard';
+      } else {
+        const error = await response.text();
+        alert('Nepodařilo se smazat vozidlo: ' + error);
+        setDeleting(false);
+      }
     } catch (err) {
-      console.error('Error deleting car:', err);
       alert('Nepodařilo se smazat vozidlo: ' + (err.message || 'Neznámá chyba'));
       setDeleting(false);
     }
@@ -153,17 +165,6 @@ export const CarDetailPage = () => {
       <div className="max-w-lg mx-auto px-4 -mt-24">
         {/* Car Card */}
         <div className="bg-[rgb(var(--card))] rounded-2xl shadow-xl overflow-hidden mb-6">
-          {/* Car Image */}
-          {car.image && (
-            <div className="h-48 overflow-hidden">
-              <img
-                src={car.image}
-                alt={`${car.brand} ${car.model}`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-          
           {/* Stats Grid */}
           <div className="grid grid-cols-4 gap-1 p-4">
             <div className="text-center p-3 bg-[rgb(var(--secondary))] rounded-xl">
