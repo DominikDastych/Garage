@@ -39,6 +39,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('car_garage_token');
     localStorage.removeItem('car_garage_user');
+    // Force page reload to clear all cached data
+    window.location.href = '/login';
   };
 
   const updateUser = (userData) => {

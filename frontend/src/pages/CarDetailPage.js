@@ -25,11 +25,23 @@ export const CarDetailPage = () => {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('car_garage_token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     loadData();
   }, [id]);
 
   const loadData = async () => {
     try {
+      const token = localStorage.getItem('car_garage_token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      
       const [carData, servicesData, statsData] = await Promise.all([
         carsApi.get(id),
         servicesApi.getAll(id),
@@ -40,6 +52,7 @@ export const CarDetailPage = () => {
       setStats(statsData);
     } catch (err) {
       console.error('Error loading car:', err);
+      // If car not found (likely belongs to different user), go to dashboard
       navigate('/dashboard');
     } finally {
       setLoading(false);

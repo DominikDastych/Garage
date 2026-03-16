@@ -7,14 +7,20 @@ import { Car, Plus, Fuel, Gauge, Loader2, ChevronRight, Settings, Wallet } from 
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [cars, setCars] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Reload data when user changes
   useEffect(() => {
-    loadData();
-  }, []);
+    if (token) {
+      setCars([]);
+      setStats(null);
+      setLoading(true);
+      loadData();
+    }
+  }, [token, user?.id]);
 
   const loadData = async () => {
     try {
@@ -26,6 +32,8 @@ export const DashboardPage = () => {
       setStats(statsData);
     } catch (err) {
       console.error('Error loading data:', err);
+      setCars([]);
+      setStats(null);
     } finally {
       setLoading(false);
     }

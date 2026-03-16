@@ -10,6 +10,7 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 4. Cost Tracking - Monitor expenses per car and total
 5. PWA - Installable on mobile home screen
 6. Responsive Design - Dark sporty theme
+7. User data isolation - Each user sees only their own cars
 
 ## Tech Stack
 - Backend: FastAPI + MongoDB
@@ -23,6 +24,7 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 - User registration with email/password
 - User login with JWT tokens
 - Protected routes and API endpoints
+- Data isolation per user
 
 ### Car Management (NO IMAGES)
 - Add new cars with brand/model selection
@@ -41,6 +43,7 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 - Overview of all vehicles (card layout, no images)
 - Total costs tracking
 - Quick access to add cars
+- Reloads data when user changes
 
 ### UI/UX
 - Dark sporty theme
@@ -51,15 +54,15 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 ## Recent Fixes (2026-03-16)
 1. REMOVED all car images from the app (per user request)
 2. Fixed DELETE car functionality - direct fetch with proper Authorization header
-3. Fixed DELETE service record functionality - direct fetch with proper Authorization header
-4. Added better error handling with specific messages for 401/404 errors
-5. Simplified car cards without images
+3. Fixed DELETE service record functionality
+4. Fixed user data isolation - dashboard reloads when user changes
+5. Logout now redirects to login page and clears all cached data
 
 ## Testing Status
-- DELETE car: CONFIRMED WORKING (API returns 200, redirects to dashboard)
+- DELETE car: CONFIRMED WORKING
 - DELETE service record: CONFIRMED WORKING
-- No images: CONFIRMED (all image components removed)
-- Frontend: 100% tests passed
+- User data isolation: FIXED (each user sees only their own cars)
+- No images: CONFIRMED
 
 ## Files Structure
 ```
@@ -71,11 +74,12 @@ Mobile-first Progressive Web App for managing personal car garage. Users can tra
 └── frontend/
     ├── src/
     │   ├── pages/
-    │   │   ├── DashboardPage.js (no images)
-    │   │   ├── CarDetailPage.js (no images, working delete)
-    │   │   ├── CarFormPage.js (no images)
+    │   │   ├── DashboardPage.js (reloads on user change)
+    │   │   ├── CarDetailPage.js (working delete)
+    │   │   ├── CarFormPage.js
     │   │   └── ...
     │   ├── services/api.js
-    │   └── contexts/
+    │   ├── contexts/AuthContext.js (logout clears data)
+    │   └── components/
     └── package.json
 ```
