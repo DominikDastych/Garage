@@ -12,16 +12,6 @@ export const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Reload data when user changes
-  useEffect(() => {
-    if (token) {
-      setCars([]);
-      setStats(null);
-      setLoading(true);
-      loadData();
-    }
-  }, [token, user?.id]);
-
   const loadData = async () => {
     try {
       const [carsData, statsData] = await Promise.all([
@@ -38,6 +28,35 @@ export const DashboardPage = () => {
       setLoading(false);
     }
   };
+
+  // Load data on mount and when returning to page
+  useEffect(() => {
+    if (token) {
+      loadData();
+    }
+    
+    // Reload data when page becomes visible (user returns to tab/page)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && token) {
+        loadData();
+      }
+    };
+    
+    // Reload data when window gets focus
+    const handleFocus = () => {
+      if (token) {
+        loadData();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [token]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('cs-CZ', {
