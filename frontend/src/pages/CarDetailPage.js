@@ -1,3 +1,8 @@
+// ============================================
+// CAR DETAIL PAGE - Detail vozidla
+// ============================================
+// Zobrazuje detail auta, servisní záznamy a umožňuje mazání
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { carsApi, servicesApi } from '../services/api';
@@ -6,6 +11,7 @@ import {
   Gauge, Fuel, Loader2, Trash2, Car, Settings, TrendingUp
 } from 'lucide-react';
 
+// Typy servisů s ikonami a barvami
 const SERVICE_TYPES = {
   oil: { label: 'Výměna oleje', icon: '🛢️', color: 'from-yellow-500 to-amber-600' },
   stk: { label: 'STK / Emise', icon: '📋', color: 'from-blue-500 to-blue-600' },
@@ -16,16 +22,18 @@ const SERVICE_TYPES = {
 
 export const CarDetailPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [car, setCar] = useState(null);
-  const [services, setServices] = useState([]);
-  const [stats, setStats] = useState(null);
+  const { id } = useParams();  // ID auta z URL
+  
+  // Stavy komponenty
+  const [car, setCar] = useState(null);           // Data auta
+  const [services, setServices] = useState([]);    // Servisní záznamy
+  const [stats, setStats] = useState(null);        // Statistiky
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('services');
+  const [activeTab, setActiveTab] = useState('services');  // Aktivní záložka
   const [deleting, setDeleting] = useState(false);
 
+  // Kontrola přihlášení a načtení dat
   useEffect(() => {
-    // Check if user is authenticated
     const token = localStorage.getItem('car_garage_token');
     if (!token) {
       navigate('/login');
@@ -34,6 +42,7 @@ export const CarDetailPage = () => {
     loadData();
   }, [id]);
 
+  // Načtení dat auta ze serveru
   const loadData = async () => {
     try {
       const token = localStorage.getItem('car_garage_token');
@@ -42,6 +51,7 @@ export const CarDetailPage = () => {
         return;
       }
       
+      // Paralelní načtení všech dat
       const [carData, servicesData, statsData] = await Promise.all([
         carsApi.get(id),
         servicesApi.getAll(id),
@@ -52,13 +62,13 @@ export const CarDetailPage = () => {
       setStats(statsData);
     } catch (err) {
       console.error('Error loading car:', err);
-      // If car not found (likely belongs to different user), go to dashboard
       navigate('/dashboard');
     } finally {
       setLoading(false);
     }
   };
 
+  // Smazání servisního záznamu
   const handleDeleteService = async (serviceId) => {
     if (!window.confirm('Smazat tento servisní záznam?')) return;
     try {

@@ -1,3 +1,8 @@
+// ============================================
+// APP.JS - Hlavní komponenta aplikace
+// ============================================
+// Definuje strukturu aplikace a routování (navigaci mezi stránkami)
+
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -10,10 +15,15 @@ import { ServiceFormPage } from './pages/ServiceFormPage';
 import { SettingsPage } from './pages/SettingsPage';
 import './index.css';
 
-// Protected Route Component
+// ============================================
+// CHRÁNĚNÁ ROUTA
+// ============================================
+// Komponenta, která kontroluje, zda je uživatel přihlášen
+// Pokud ne, přesměruje ho na přihlašovací stránku
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
+  // Zobrazí loading spinner během kontroly přihlášení
   if (loading) {
     return (
       <div className="min-h-screen bg-[rgb(var(--background))] flex items-center justify-center">
@@ -27,79 +37,81 @@ const ProtectedRoute = ({ children }) => {
     );
   }
   
+  // Pokud není přihlášen, přesměruj na login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   
+  // Pokud je přihlášen, zobraz požadovanou stránku
   return children;
 };
 
+// ============================================
+// DEFINICE ROUT (STRÁNEK)
+// ============================================
 const AppRoutes = () => {
   const { isAuthenticated } = useAuth();
   
   return (
     <Routes>
+      {/* Přihlášení - pokud je už přihlášen, přesměruj na dashboard */}
       <Route 
         path="/login" 
         element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
       />
+      
+      {/* Dashboard - hlavní stránka s přehledem aut */}
       <Route 
         path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        } 
+        element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} 
       />
+      
+      {/* Přidání nového auta */}
       <Route 
         path="/car/new" 
-        element={
-          <ProtectedRoute>
-            <CarFormPage />
-          </ProtectedRoute>
-        } 
+        element={<ProtectedRoute><CarFormPage /></ProtectedRoute>} 
       />
+      
+      {/* Detail auta */}
       <Route 
         path="/car/:id" 
-        element={
-          <ProtectedRoute>
-            <CarDetailPage />
-          </ProtectedRoute>
-        } 
+        element={<ProtectedRoute><CarDetailPage /></ProtectedRoute>} 
       />
+      
+      {/* Úprava auta */}
       <Route 
         path="/car/:id/edit" 
-        element={
-          <ProtectedRoute>
-            <CarFormPage />
-          </ProtectedRoute>
-        } 
+        element={<ProtectedRoute><CarFormPage /></ProtectedRoute>} 
       />
+      
+      {/* Přidání servisního záznamu */}
       <Route 
         path="/car/:carId/service/new" 
-        element={
-          <ProtectedRoute>
-            <ServiceFormPage />
-          </ProtectedRoute>
-        } 
+        element={<ProtectedRoute><ServiceFormPage /></ProtectedRoute>} 
       />
+      
+      {/* Nastavení */}
       <Route 
         path="/settings" 
-        element={
-          <ProtectedRoute>
-            <SettingsPage />
-          </ProtectedRoute>
-        } 
+        element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} 
       />
+      
+      {/* Výchozí přesměrování na dashboard */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 };
 
+// ============================================
+// HLAVNÍ KOMPONENTA
+// ============================================
 function App() {
   return (
+    // ThemeProvider - poskytuje tmavý/světlý režim
     <ThemeProvider>
+      {/* AuthProvider - poskytuje info o přihlášeném uživateli */}
       <AuthProvider>
+        {/* BrowserRouter - umožňuje navigaci mezi stránkami */}
         <BrowserRouter>
           <div className="App">
             <AppRoutes />

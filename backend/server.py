@@ -1,85 +1,92 @@
+# ============================================
+# MY CAR GARAGE - BACKEND SERVER
+# ============================================
+# REST API pro správu vozidel a servisních záznamů
+# Technologie: FastAPI + MongoDB + JWT autentizace
+
+# === IMPORTY ===
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient  # MongoDB driver
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr  # Validace dat
 from typing import List, Optional
-import uuid
+import uuid  # Generování unikátních ID
 from datetime import datetime, timezone, timedelta
-import httpx
-import jwt
-import bcrypt
+import httpx  # HTTP klient pro externí API
+import jwt    # JSON Web Token pro autentizaci
+import bcrypt # Hashování hesel
 import base64
 
+# === KONFIGURACE ===
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / '.env')  # Načtení .env souboru
 
-# MongoDB connection
+# Připojení k MongoDB databázi
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'car_garage_db')]
 
-# JWT Config
+# JWT konfigurace pro přihlašování
 JWT_SECRET = os.environ.get('JWT_SECRET', 'super-secret-key')
 JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24 * 7  # 7 days
+JWT_EXPIRATION_HOURS = 24 * 7  # Token platí 7 dní
 
-# API Ninjas
+# Externí API pro data o autech
 API_NINJAS_KEY = os.environ.get('API_NINJAS_KEY', '')
 API_NINJAS_URL = "https://api.api-ninjas.com/v1/cars"
 
-# Create the main app
+# === VYTVOŘENÍ APLIKACE ===
 app = FastAPI(title="My Car Garage API", version="1.0.0")
-
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
-
-# Security
+api_router = APIRouter(prefix="/api")  # Všechny routy začínají /api
 security = HTTPBearer(auto_error=False)
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Logování
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# ============== MODELS ==============
+# === DATOVÉ MODELY (Pydantic) ===
+# Definují strukturu dat pro validaci
 
 class UserRegister(BaseModel):
-    email: EmailStr
+    """Data pro registraci"""
+    email: EmailStr  # Validovaný email
     password: str
     name: str
 
 class UserLogin(BaseModel):
+    """Data pro přihlášení"""
     email: EmailStr
     password: str
 
 class User(BaseModel):
+    """Uživatel (bez hesla)"""
     id: str
     email: str
     name: str
     created_at: str
 
 class CarCreate(BaseModel):
-    brand: str
-    model: str
-    year: int
+    """Data pro vytvoření auta"""
+    brand: str           # Značka
+    model: str           # Model
+    year: int            # Rok výroby
     power_kw: Optional[int] = None
     power_hp: Optional[int] = None
-    fuel_type: Optional[str] = None
-    transmission: Optional[str] = None
-    body_type: Optional[str] = None
-    image: Optional[str] = None  # Base64 or URL
+    fuel_type: Optional[str] = None      # Palivo
+    transmission: Optional[str] = None   # Převodovka
+    body_type: Optional[str] = None      # Karoserie
+    image: Optional[str] = None
     color: Optional[str] = None
-    license_plate: Optional[str] = None
-    mileage: Optional[int] = None
+    license_plate: Optional[str] = None  # SPZ
+    mileage: Optional[int] = None        # Nájezd km
 
 class Car(BaseModel):
+    """Kompletní data auta"""
     id: str
     user_id: str
     brand: str
@@ -95,17 +102,19 @@ class Car(BaseModel):
     license_plate: Optional[str] = None
     mileage: Optional[int] = None
     created_at: str
-    total_cost: float = 0
+    total_cost: float = 0  # Celkové náklady
 
 class ServiceRecordCreate(BaseModel):
+    """Data pro servisní záznam"""
     car_id: str
-    service_type: str  # oil, stk, tires, brakes, other
+    service_type: str  # Typ: oil, stk, tires, brakes, other
     date: str
     cost: float
     mileage: Optional[int] = None
     note: Optional[str] = None
 
 class ServiceRecord(BaseModel):
+    """Kompletní servisní záznam"""
     id: str
     car_id: str
     user_id: str
@@ -117,18 +126,22 @@ class ServiceRecord(BaseModel):
     created_at: str
 
 class Settings(BaseModel):
+    """Nastavení uživatele"""
     theme: str = "dark"
     language: str = "cs"
 
-# ============== AUTH HELPERS ==============
+# === POMOCNÉ FUNKCE PRO AUTENTIZACI ===
 
 def hash_password(password: str) -> str:
+    """Zahashuje heslo (jednosměrná funkce)"""
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def verify_password(password: str, hashed: str) -> bool:
+    """Ověří heslo proti hashi"""
     return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
 
 def create_token(user_id: str, email: str) -> str:
+    """Vytvoří JWT token"""
     payload = {
         "user_id": user_id,
         "email": email,
@@ -137,6 +150,7 @@ def create_token(user_id: str, email: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 def decode_token(token: str) -> dict:
+    """Dekóduje a ověří JWT token"""
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         return payload
@@ -146,6 +160,7 @@ def decode_token(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Získá přihlášeného uživatele z tokenu (Dependency)"""
     if not credentials:
         raise HTTPException(status_code=401, detail="Not authenticated")
     

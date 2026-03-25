@@ -1,3 +1,8 @@
+// ============================================
+// DASHBOARD PAGE - Hlavní stránka s přehledem aut
+// ============================================
+// Zobrazuje seznam všech vozidel uživatele a statistiky
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -8,12 +13,16 @@ import { Car, Plus, Fuel, Gauge, Loader2, ChevronRight, Settings, Wallet } from 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
-  const [cars, setCars] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Stavy komponenty
+  const [cars, setCars] = useState([]);         // Seznam aut
+  const [stats, setStats] = useState(null);     // Statistiky
+  const [loading, setLoading] = useState(true); // Stav načítání
 
+  // Funkce pro načtení dat z API
   const loadData = async () => {
     try {
+      // Paralelní načtení aut a statistik
       const [carsData, statsData] = await Promise.all([
         carsApi.getAll(),
         statsApi.getAll()
@@ -29,35 +38,37 @@ export const DashboardPage = () => {
     }
   };
 
-  // Load data on mount and when returning to page
+  // Načtení dat při zobrazení stránky
   useEffect(() => {
     if (token) {
       loadData();
     }
     
-    // Reload data when page becomes visible (user returns to tab/page)
+    // Reload dat když se uživatel vrátí na stránku
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && token) {
         loadData();
       }
     };
     
-    // Reload data when window gets focus
     const handleFocus = () => {
       if (token) {
         loadData();
       }
     };
     
+    // Přidání event listenerů
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
     
+    // Cleanup při unmount
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
   }, [token]);
 
+  // Formátování částky v CZK
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('cs-CZ', {
       style: 'currency',
@@ -66,6 +77,7 @@ export const DashboardPage = () => {
     }).format(amount || 0);
   };
 
+  // Zobrazení loading spinneru
   if (loading) {
     return (
       <div className="min-h-screen bg-[rgb(var(--background))] flex items-center justify-center">
@@ -79,7 +91,7 @@ export const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-[rgb(var(--background))] pb-24">
-      {/* Header */}
+      {/* Hlavička s gradientem */}
       <div className="bg-gradient-to-br from-[rgb(var(--primary))] to-orange-600 pt-12 pb-24 px-6">
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between mb-2">
@@ -87,6 +99,7 @@ export const DashboardPage = () => {
               <p className="text-white/70 text-sm">Vítej zpět,</p>
               <h1 className="text-2xl font-bold text-white">{user?.name || 'Řidiči'} 👋</h1>
             </div>
+            {/* Tlačítko nastavení */}
             <button
               onClick={() => navigate('/settings')}
               className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
@@ -97,9 +110,10 @@ export const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Karty se statistikami */}
       <div className="max-w-lg mx-auto px-6 -mt-16">
         <div className="grid grid-cols-2 gap-4 mb-8">
+          {/* Počet vozidel */}
           <div className="bg-[rgb(var(--card))] rounded-2xl p-5 shadow-lg">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[rgb(var(--primary))] to-orange-500 flex items-center justify-center">
@@ -111,6 +125,7 @@ export const DashboardPage = () => {
               </div>
             </div>
           </div>
+          {/* Celkové náklady */}
           <div className="bg-[rgb(var(--card))] rounded-2xl p-5 shadow-lg">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
@@ -124,7 +139,7 @@ export const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Section Header */}
+        {/* Nadpis sekce s tlačítkem přidat */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold">Moje vozidla</h2>
           <button
@@ -136,8 +151,9 @@ export const DashboardPage = () => {
           </button>
         </div>
 
-        {/* Cars List */}
+        {/* Seznam vozidel nebo prázdný stav */}
         {cars.length === 0 ? (
+          // Prázdný stav - žádná auta
           <div className="bg-[rgb(var(--card))] rounded-2xl p-8 text-center">
             <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[rgb(var(--primary))]/20 to-orange-500/20 flex items-center justify-center">
               <Car className="w-10 h-10 text-[rgb(var(--primary))]" />
@@ -154,6 +170,7 @@ export const DashboardPage = () => {
             </button>
           </div>
         ) : (
+          // Seznam aut
           <div className="space-y-4">
             {cars.map((car) => (
               <div
@@ -161,7 +178,7 @@ export const DashboardPage = () => {
                 onClick={() => navigate(`/car/${car.id}`)}
                 className="bg-[rgb(var(--card))] rounded-2xl overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow p-4"
               >
-                {/* Car Info */}
+                {/* Info o autě */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[rgb(var(--primary))]/20 to-orange-500/20 flex items-center justify-center">
@@ -176,6 +193,7 @@ export const DashboardPage = () => {
                       </p>
                     </div>
                   </div>
+                  {/* Badge typ karoserie */}
                   {car.body_type && (
                     <span className="px-3 py-1 bg-[rgb(var(--secondary))] rounded-lg text-sm">
                       {car.body_type}
@@ -183,28 +201,32 @@ export const DashboardPage = () => {
                   )}
                 </div>
 
-                {/* Car Details */}
+                {/* Detaily auta */}
                 <div className="mt-4 pt-4 border-t border-[rgb(var(--border))]">
                   <div className="flex items-center justify-between">
                     <div className="flex gap-4">
+                      {/* Výkon */}
                       {car.power_hp && (
                         <div className="flex items-center gap-1.5 text-sm text-[rgb(var(--muted-foreground))]">
                           <Gauge className="w-4 h-4 text-[rgb(var(--primary))]" />
                           <span className="font-medium">{car.power_hp} HP</span>
                         </div>
                       )}
+                      {/* Palivo */}
                       {car.fuel_type && (
                         <div className="flex items-center gap-1.5 text-sm text-[rgb(var(--muted-foreground))]">
                           <Fuel className="w-4 h-4 text-orange-500" />
                           <span>{car.fuel_type}</span>
                         </div>
                       )}
+                      {/* Převodovka */}
                       {car.transmission && (
                         <div className="text-sm text-[rgb(var(--muted-foreground))]">
                           {car.transmission.substring(0, 5)}
                         </div>
                       )}
                     </div>
+                    {/* Náklady a šipka */}
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[rgb(var(--primary))]">
                         {formatCurrency(car.total_cost)}
@@ -219,6 +241,7 @@ export const DashboardPage = () => {
         )}
       </div>
 
+      {/* Spodní navigace */}
       <BottomNav />
     </div>
   );

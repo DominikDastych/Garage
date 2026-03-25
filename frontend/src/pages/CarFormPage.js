@@ -1,8 +1,14 @@
+// ============================================
+// CAR FORM PAGE - Formulář pro přidání/úpravu auta
+// ============================================
+// Obsahuje výběr značky, modelu, paliva, převodovky atd.
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { carsApi } from '../services/api';
 import { ArrowLeft, Search, Loader2, ChevronDown, Check } from 'lucide-react';
 
+// Možnosti paliva
 const FUEL_TYPES = [
   { id: 'benzin', label: 'Benzín', icon: '⛽' },
   { id: 'diesel', label: 'Diesel', icon: '🛢️' },
@@ -11,11 +17,13 @@ const FUEL_TYPES = [
   { id: 'lpg', label: 'LPG', icon: '💨' },
 ];
 
+// Možnosti převodovky
 const TRANSMISSIONS = [
   { id: 'manual', label: 'Manuální', icon: '🕹️' },
   { id: 'automat', label: 'Automatická', icon: '🅰️' },
 ];
 
+// Typy karoserie
 const BODY_TYPES = [
   { id: 'sedan', label: 'Sedan', icon: '🚗' },
   { id: 'hatchback', label: 'Hatchback', icon: '🚙' },
@@ -28,33 +36,37 @@ const BODY_TYPES = [
 export const CarFormPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const isEdit = id && id !== 'new';
+  const isEdit = id && id !== 'new';  // true = editace, false = nové auto
   
+  // Stavy
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [makes, setMakes] = useState([]);
-  const [models, setModels] = useState([]);
+  const [makes, setMakes] = useState([]);       // Seznam značek
+  const [models, setModels] = useState([]);     // Seznam modelů
   const [loadingModels, setLoadingModels] = useState(false);
   
+  // Stavy pro dropdowny
   const [showMakeDropdown, setShowMakeDropdown] = useState(false);
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [makeSearch, setMakeSearch] = useState('');
   const [modelSearch, setModelSearch] = useState('');
   
+  // Data formuláře
   const [formData, setFormData] = useState({
-    brand: '',
-    model: '',
-    year: new Date().getFullYear(),
-    power_kw: '',
-    power_hp: '',
-    fuel_type: '',
-    transmission: '',
-    body_type: '',
-    color: '',
-    license_plate: '',
-    mileage: ''
+    brand: '',           // Značka
+    model: '',           // Model
+    year: new Date().getFullYear(),  // Rok
+    power_kw: '',        // Výkon kW
+    power_hp: '',        // Výkon HP
+    fuel_type: '',       // Palivo
+    transmission: '',    // Převodovka
+    body_type: '',       // Karoserie
+    color: '',           // Barva
+    license_plate: '',   // SPZ
+    mileage: ''          // Nájezd
   });
 
+  // Načtení značek při startu
   useEffect(() => {
     loadMakes();
     if (isEdit) {

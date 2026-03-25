@@ -1,7 +1,15 @@
+// ============================================
+// AUTH CONTEXT - Správa přihlášení uživatele
+// ============================================
+// React Context pro sdílení stavu přihlášení napříč aplikací
+// Ukládá token a info o uživateli do localStorage
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// Vytvoření kontextu
 const AuthContext = createContext(null);
 
+// Hook pro použití auth kontextu v komponentách
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -10,13 +18,14 @@ export const useAuth = () => {
   return context;
 };
 
+// Provider komponenta - obaluje celou aplikaci
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);      // Info o uživateli
+  const [token, setToken] = useState(null);    // JWT token
+  const [loading, setLoading] = useState(true); // Stav načítání
 
+  // Při startu aplikace zkontroluj, zda je uložené přihlášení
   useEffect(() => {
-    // Check for saved auth
     const savedToken = localStorage.getItem('car_garage_token');
     const savedUser = localStorage.getItem('car_garage_user');
     
@@ -27,6 +36,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // Funkce pro přihlášení - uloží token a uživatele
   const login = (authToken, userData) => {
     setToken(authToken);
     setUser(userData);
@@ -34,22 +44,32 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('car_garage_user', JSON.stringify(userData));
   };
 
+  // Funkce pro odhlášení - smaže token a přesměruje na login
   const logout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('car_garage_token');
     localStorage.removeItem('car_garage_user');
-    // Force page reload to clear all cached data
     window.location.href = '/login';
   };
 
+  // Funkce pro aktualizaci údajů uživatele
   const updateUser = (userData) => {
     setUser(userData);
     localStorage.setItem('car_garage_user', JSON.stringify(userData));
   };
 
+  // Poskytnutí hodnot všem child komponentám
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ 
+      user,                          // Data uživatele
+      token,                         // JWT token
+      loading,                       // Stav načítání
+      login,                         // Funkce přihlášení
+      logout,                        // Funkce odhlášení
+      updateUser,                    // Funkce aktualizace
+      isAuthenticated: !!token       // Je přihlášen? (true/false)
+    }}>
       {children}
     </AuthContext.Provider>
   );
