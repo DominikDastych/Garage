@@ -114,10 +114,6 @@ export const CarDetailPage = () => {
       
       const API_URL = process.env.REACT_APP_BACKEND_URL || '';
       
-      console.log('Deleting car:', id);
-      console.log('Token exists:', !!token);
-      console.log('API URL:', API_URL);
-      
       const response = await fetch(`${API_URL}/api/cars/${id}`, {
         method: 'DELETE',
         headers: {
@@ -126,23 +122,20 @@ export const CarDetailPage = () => {
         }
       });
       
-      console.log('Delete response status:', response.status);
-      
       if (response.ok) {
-        // Redirect to dashboard with cache bypass
-        window.location.assign(window.location.origin + '/dashboard?t=' + Date.now());
+        alert('Vozidlo bylo úspěšně smazáno!');
+        window.location.href = '/dashboard';
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Delete error:', errorData);
         
         if (response.status === 401) {
           alert('Vaše přihlášení vypršelo. Přihlaste se znovu.');
           localStorage.removeItem('car_garage_token');
           localStorage.removeItem('car_garage_user');
-          window.location.assign('/login');
+          window.location.href = '/login';
         } else if (response.status === 404) {
           alert('Vozidlo nebylo nalezeno. Možná bylo již smazáno.');
-          window.location.assign(window.location.origin + '/dashboard?t=' + Date.now());
+          window.location.href = '/dashboard';
         } else {
           alert('Nepodařilo se smazat vozidlo. Zkuste to znovu.');
           setDeleting(false);
