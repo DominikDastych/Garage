@@ -129,8 +129,8 @@ export const CarDetailPage = () => {
       console.log('Delete response status:', response.status);
       
       if (response.ok) {
-        // Force page reload to dashboard
-        window.location.replace('/dashboard');
+        // Redirect to dashboard with cache bypass
+        window.location.assign(window.location.origin + '/dashboard?t=' + Date.now());
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Delete error:', errorData);
@@ -139,10 +139,10 @@ export const CarDetailPage = () => {
           alert('Vaše přihlášení vypršelo. Přihlaste se znovu.');
           localStorage.removeItem('car_garage_token');
           localStorage.removeItem('car_garage_user');
-          window.location.href = '/login';
+          window.location.assign('/login');
         } else if (response.status === 404) {
           alert('Vozidlo nebylo nalezeno. Možná bylo již smazáno.');
-          window.location.replace('/dashboard');
+          window.location.assign(window.location.origin + '/dashboard?t=' + Date.now());
         } else {
           alert('Nepodařilo se smazat vozidlo. Zkuste to znovu.');
           setDeleting(false);
