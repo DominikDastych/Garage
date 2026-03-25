@@ -147,25 +147,52 @@ export const CarFormPage = () => {
     setSaving(true);
     
     try {
+      const token = localStorage.getItem('car_garage_token');
+      const API_URL = process.env.REACT_APP_BACKEND_URL || '';
+      
+      if (!token) {
+        alert('Nejste přihlášeni. Přihlaste se znovu.');
+        window.location.href = '/login';
+        return;
+      }
+      
       const data = {
-        ...formData,
+        brand: formData.brand,
+        model: formData.model,
         year: parseInt(formData.year),
         power_kw: formData.power_kw ? parseInt(formData.power_kw) : null,
         power_hp: formData.power_hp ? parseInt(formData.power_hp) : null,
         mileage: formData.mileage ? parseInt(formData.mileage) : null,
+        fuel_type: formData.fuel_type || null,
+        transmission: formData.transmission || null,
+        body_type: formData.body_type || null,
+        color: formData.color || null,
+        license_plate: formData.license_plate || null,
         image: null
       };
       
-      if (isEdit) {
-        await carsApi.update(id, data);
-      } else {
-        await carsApi.create(data);
-      }
+      const url = isEdit ? `${API_URL}/api/cars/${id}` : `${API_URL}/api/cars`;
+      const method = isEdit ? 'PUT' : 'POST';
       
-      navigate('/dashboard');
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (response.ok) {
+        window.location.href = '/dashboard';
+      } else {
+        const error = await response.text();
+        console.error('Error saving car:', error);
+        alert('Nepodařilo se uložit vozidlo: ' + error);
+      }
     } catch (err) {
       console.error('Error saving car:', err);
-      alert('Nepodařilo se uložit vozidlo');
+      alert('Nepodařilo se uložit vozidlo: ' + (err.message || 'Neznámá chyba'));
     } finally {
       setSaving(false);
     }
