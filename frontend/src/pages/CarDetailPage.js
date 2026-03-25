@@ -124,25 +124,19 @@ export const CarDetailPage = () => {
       
       if (response.ok) {
         alert('Vozidlo bylo úspěšně smazáno!');
-        // Use setTimeout to ensure alert is closed before redirect
-        setTimeout(() => {
-          window.location.replace('/dashboard');
-        }, 100);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        
+        // Hard reload - clears all cache
+        window.location.href = window.location.origin + '/dashboard';
+        window.location.reload(true);
+      } else {        
         if (response.status === 401) {
           alert('Vaše přihlášení vypršelo. Přihlaste se znovu.');
           localStorage.removeItem('car_garage_token');
           localStorage.removeItem('car_garage_user');
-          setTimeout(() => {
-            window.location.replace('/login');
-          }, 100);
+          window.location.href = '/login';
         } else if (response.status === 404) {
           alert('Vozidlo nebylo nalezeno. Možná bylo již smazáno.');
-          setTimeout(() => {
-            window.location.replace('/dashboard');
-          }, 100);
+          window.location.href = window.location.origin + '/dashboard';
+          window.location.reload(true);
         } else {
           alert('Nepodařilo se smazat vozidlo. Zkuste to znovu.');
           setDeleting(false);
