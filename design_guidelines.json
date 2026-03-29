@@ -1,0 +1,163 @@
+{
+  "typography": {
+    "font_family": {
+      "headings": "Barlow Condensed, sans-serif",
+      "body": "Manrope, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "google_fonts_url": "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+    "usage": {
+      "h1": "font-headings font-black text-5xl md:text-7xl uppercase tracking-tighter leading-none",
+      "h2": "font-headings font-bold text-4xl md:text-5xl uppercase tracking-tight",
+      "h3": "font-headings font-bold text-2xl md:text-3xl uppercase tracking-normal",
+      "body_large": "font-body text-lg md:text-xl leading-relaxed",
+      "body_default": "font-body text-base leading-relaxed text-muted-foreground",
+      "caption": "font-mono text-xs uppercase tracking-widest text-muted-foreground",
+      "button": "font-headings font-bold uppercase tracking-wider text-lg"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "DEFAULT": "#0055FF",
+        "foreground": "#FFFFFF",
+        "hover": "#0044CC"
+      },
+      "accent": {
+        "DEFAULT": "#CCFF00",
+        "foreground": "#000000",
+        "hover": "#B3E600"
+      },
+      "destructive": {
+        "DEFAULT": "#FF3B30",
+        "foreground": "#FFFFFF"
+      },
+      "background": {
+        "light": "#FFFFFF",
+        "dark": "#0A0A0A"
+      },
+      "surface": {
+        "light": "#F4F4F5",
+        "dark": "#18181B"
+      },
+      "border": {
+        "light": "#E4E4E7",
+        "dark": "#27272A"
+      }
+    },
+    "theme_strategy": "Performance Pro (Archetype 2)",
+    "instructions": "Use High Contrast. Dark mode is the default 'vibe' for the app, but Light mode must be clean and clinical. Primary Blue is for Brand/Navigation. Accent Lime is for 'Buy' / 'Success' / 'Active' states."
+  },
+  "visual_enhancers": {
+    "ticket_stub_effect": {
+      "css_class": "ticket-stub",
+      "description": "Use a CSS mask or radial-gradient background to create 'bites' out of the corners of cards.",
+      "snippet": "mask-image: radial-gradient(circle at top left, transparent 10px, black 11px), radial-gradient(circle at top right, transparent 10px, black 11px), radial-gradient(circle at bottom left, transparent 10px, black 11px), radial-gradient(circle at bottom right, transparent 10px, black 11px); mask-composite: intersect;"
+    },
+    "noise_texture": {
+      "css_class": "bg-noise",
+      "description": "Subtle grain overlay for dark mode backgrounds to avoid flat colors.",
+      "snippet": "background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E\");"
+    },
+    "glassmorphism": {
+      "nav_bar": "bg-background/80 backdrop-blur-xl border-t border-border/50",
+      "floating_header": "bg-background/70 backdrop-blur-lg border-b border-border/50"
+    }
+  },
+  "layout": {
+    "container": "max-w-md mx-auto md:max-w-2xl lg:max-w-4xl xl:max-w-6xl px-4 md:px-8",
+    "spacing": {
+      "section_gap": "py-12 md:py-20",
+      "card_padding": "p-6 md:p-8",
+      "element_gap": "gap-4 md:gap-6"
+    },
+    "grid_strategy": "Bento Grid Mode A for Home/Dashboard. Strict List View for Events."
+  },
+  "components": {
+    "buttons": {
+      "style": "sharp",
+      "radius": "rounded-sm",
+      "base_classes": "h-12 px-8 font-headings font-bold uppercase tracking-wider transition-all active:scale-95"
+    },
+    "cards": {
+      "style": "ticket",
+      "radius": "rounded-lg",
+      "base_classes": "relative overflow-hidden border border-border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all"
+    },
+    "inputs": {
+      "style": "solid",
+      "radius": "rounded-md",
+      "base_classes": "h-12 bg-surface/50 border-transparent focus:border-primary focus:ring-2 focus:ring-primary/20 font-body"
+    },
+    "navigation": {
+      "type": "bottom_tab_bar",
+      "style": "glass",
+      "icons": "lucide-react"
+    }
+  },
+  "image_urls": {
+    "soccer": [
+      {
+        "url": "https://images.unsplash.com/photo-1693517413656-d3445182b2e2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwxfHxlbmVyZ2V0aWMlMjBzb2NjZXIlMjBtYXRjaCUyMHN0YWRpdW0lMjBjcm93ZCUyMGFjdGlvbnxlbnwwfHx8fDE3NzEyMjg1NTR8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Large crowd in stadium",
+        "category": "hero"
+      },
+      {
+        "url": "https://images.unsplash.com/flagged/photo-1550413231-202a9d53a331?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHw0fHxlbmVyZ2V0aWMlMjBzb2NjZXIlMjBtYXRjaCUyMHN0YWRpdW0lMjBjcm93ZCUyMGFjdGlvbnxlbnwwfHx8fDE3NzEyMjg1NTR8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Soccer game action",
+        "category": "event_card"
+      }
+    ],
+    "basketball": [
+      {
+        "url": "https://images.unsplash.com/photo-1759694423710-8e8defcfefd3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwxfHxiYXNrZXRiYWxsJTIwcGxheWVyJTIwZHVua2luZyUyMGFjdGlvbiUyMGFyZW5hfGVufDB8fHx8MTc3MTIyODU1OXww&ixlib=rb-4.1.0&q=85",
+        "description": "Basketball dunk action",
+        "category": "hero"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1766136809046-efa58a4ec469?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHw0fHxiYXNrZXRiYWxsJTIwcGxheWVyJTIwZHVua2luZyUyMGFjdGlvbiUyMGFyZW5hfGVufDB8fHx8MTc3MTIyODU1OXww&ixlib=rb-4.1.0&q=85",
+        "description": "Basketball game wide shot",
+        "category": "event_card"
+      }
+    ],
+    "tennis": [
+      {
+        "url": "https://images.unsplash.com/photo-1758314810669-346173121689?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDR8MHwxfHNlYXJjaHwxfHx0ZW5uaXMlMjBwbGF5ZXIlMjBzZXJ2aW5nJTIwbWF0Y2glMjBjb3VydHxlbnwwfHx8fDE3NzEyMjg1NjJ8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Tennis player serving",
+        "category": "event_card"
+      }
+    ],
+    "hockey": [
+      {
+        "url": "https://images.unsplash.com/photo-1768483070177-78303f00c726?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxpY2UlMjBob2NrZXklMjBnYW1lJTIwYWN0aW9uJTIwc2hvdHxlbnwwfHx8fDE3NzEyMjg1Njd8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Ice hockey game action",
+        "category": "event_card"
+      }
+    ]
+  },
+  "universal_guidelines": {
+    "principles": [
+      "Fusion over Imitation: Mix sports energy with Swiss precision.",
+      "Emotion First: Every interaction should feel like scoring a goal.",
+      "Content is King: The Event is the hero. The Ticket is the prize.",
+      "Zoom In: Use close-up action shots.",
+      "Negative Space: Don't clutter. Let the bold type breathe."
+    ],
+    "anti_patterns": [
+      "No generic 'Inter' font for headings.",
+      "No center-aligned text blocks (unless it's a title).",
+      "No gradients on text (keep it legible).",
+      "No 'default' Shadcn look. Customize borders and radius."
+    ],
+    "accessibility": {
+      "contrast": "Ensure 4.5:1 contrast for text.",
+      "touch_targets": "Minimum 44x44px for all buttons.",
+      "reduced_motion": "Respect prefers-reduced-motion."
+    },
+    "testing": {
+      "attribute": "data-testid",
+      "format": "kebab-case"
+    }
+  },
+  "instructions_to_main_agent": "1. Install the fonts in index.css immediately. 2. Update tailwind.config.js with the new colors and font families. 3. Create a 'TicketCard' component that implements the 'ticket_stub_effect' CSS. 4. Build the 'BottomNav' component with glassmorphism. 5. Ensure all pages are responsive and mobile-first."
+}
