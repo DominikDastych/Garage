@@ -99,7 +99,7 @@ export const SettingsPage = () => {
 
         {/* Footer */}
         <p className="text-center text-sm text-[rgb(var(--muted-foreground))]">
-          My Car Garage © 2024
+          My Car Garage © 2026
         </p>
       </div>
 
